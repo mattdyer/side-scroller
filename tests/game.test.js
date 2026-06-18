@@ -94,13 +94,13 @@ describe('Game Logic', () => {
             x: 100,
             y: 300,
             width: 50,
-            height: 5.0, // Small height to trigger "above" check
+            height: 50,
             vx: -2,
             type: 'zombie',
             isDead: false
         });
         game.player.x = 100;
-        game.player.y = 290;
+        game.player.y = 260;
         game.player.vy = 0.5;
         
         game.update();

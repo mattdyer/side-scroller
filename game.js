@@ -130,37 +130,32 @@ export function update() {
         player.isGrounded = true;
     }
 
-    if (player.x < 0) player.x = 0;
-    if (player.x + player.width > level.width) player.x = level.width - player.width;
-
-    enemies.forEach(enemy => {
-        if (enemy.isDead) return;
-
-        enemy.x += enemy.vx;
-        if (enemy.x < 0) enemy.x = 0;
-
-        const isColliding = (
-            player.x < enemy.x + enemy.width &&
-            player.x + player.width > enemy.x &&
-            player.y < enemy.y + enemy.height &&
-            player.y + player.height > enemy.y
-        );
-
-        if (isColliding) {
-            const isHittingFromAbove = player.vy > 0 && 
-                                     player.y + player.height < enemy.y + 25 && 
-                                       player.y + player.height > enemy.y;
-
-            if (isHittingFromAbove) {
-                enemy.isDead = true;
-                player.vy = config.jumpStrength * 0.7;
-                score += 10;
-                if (scoreElement) scoreElement.innerText = score;
-            } else {
+    if (currentLevelData && currentLevelData.pits) {
+        currentLevelData.pits.forEach(pit => {
+            if (
+                player.x < pit.x + pit.width &&
+                player.x + player.width > pit.x &&
+                player.y + player.height > canvas.height - config.groundLevel
+            ) {
                 gameState = 'gameover';
             }
-        }
-    });
+        });
+    }
+
+    if (currentLevelData && currentLevelData.spikes) {
+        currentLevelData.spikes.forEach(spike => {
+            const isColliding = (
+                player.x < spike.x + spike.width &&
+                player.x + player.width > spike.x &&
+                player.y < spike.y + spike.height &&
+                player.y + player.height > spike.y
+            );
+            if (isColliding) {
+                gameState = 'gameover';
+            }
+        });
+    }
+
 
     if (keys['KeyR']) {
         location.reload();
