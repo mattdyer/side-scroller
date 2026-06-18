@@ -1,3 +1,12 @@
+// Mock Image BEFORE importing game.js
+if (typeof global.Image === 'undefined') {
+    global.Image = class {
+        constructor() {
+            this.src = '';
+        }
+    };
+}
+
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import * as game from '../game.js';
 

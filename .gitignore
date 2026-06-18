@@ -1,0 +1,5 @@
+node_modules
+.claude/skills/image-generation/lib
+.claude/skills/image-generation/bin
+.claude/skills/image-generation/lib64
+.claude/skills/image-generation/include

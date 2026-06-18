@@ -56,7 +56,7 @@ export async function loadLevel(levelPath) {
             });
         });
         
-        player.x = 1ac; // typo fix
+        player.x = 100;
         player.x = 100;
         player.y = 300;
         player.vy = 0;
