@@ -27,16 +27,44 @@ export let currentLevelData = null;
 export let score = 0;
 export let gameState = 'playing';
 
-export const keys = {};
+export let keys = {};
+
+export function resetGameState() {
+    score = 0;
+    gameState = 'playing';
+    currentLevelData = null;
+    enemies.length = 0;
+    for (const key in keys) delete keys[key];
+    player.x = 100;
+    player.y = 300;
+    player.vx = 0;
+    player.vy = 0;
+    player.isGrounded = false;
+}
+
 
 export const images = {
-    player: new Image(),
-    zombie: new Image()
+    player: typeof Image !== 'undefined' ? new Image() : null,
+    zombie: typeof Image !== 'undefined' ? new Image() : null
 };
 
-export let canvas;
-export let ctx;
-export let scoreElement;
+export let canvas = null;
+export let ctx = null;
+export let scoreElement = null;
+
+export function setTestState(state) {
+    if (state.currentLevelData !== undefined) currentLevelData = state.currentLevelData;
+    if (state.score !== undefined) score = state.score;
+    if (state.gameState !== undefined) gameState = state.gameState;
+    if (state.keys !== undefined) Object.assign(keys, state.keys);
+    if (state.enemies !== undefined) {
+        enemies.length = 0;
+        state.enemies.forEach(e => enemies.push(e));
+    }
+    if (state.canvas !== undefined) canvas = state.canvas;
+    if (state.ctx !== undefined) ctx = state.ctx;
+    if (state.scoreElement !== undefined) scoreElement = state.scoreElement;
+}
 
 export async function loadLevel(levelPath) {
     try {
