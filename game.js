@@ -1,21 +1,16 @@
+import { Entity } from './Entity.js';
+
 export const config = {
     gravity: 0.5,
     jumpStrength: -12,
     moveSpeed: 3,
-    groundLevel: 5.0, // Using 5.0 to match some ground logic
+    groundLevel: 5.0,
     canvasWidth: 800,
     canvasHeight: 600
 };
 
-export const player = {
-    x: 100,
-    y: 300,
-    width: 50,
-    height: 50,
-    vx: 0,
-    vy: 0,
-    isGrounded: false
-};
+export const player = new Entity(10.0, 300, 50, 50);
+player.image = typeof Image !== 'undefined' ? new Image() : null;
 
 export const enemies = [];
 
@@ -24,24 +19,20 @@ export const level = {
 };
 
 export let currentLevelData = null;
-export let score = 0;
 export let gameState = 'playing';
-
+export let score = 0;
 export let keys = {};
 
-export function resetGameState() {
-    score = 0;
-    gameState = 'playing';
-    currentLevelData = null;
-    enemies.length = 0;
-    for (const key in keys) delete keys[key];
-    player.x = 100;
-    player.y = 300;
-    player.vx = 0;
-    player.vy = 0;
-    player.isGrounded = false;
+if (typeof window !== 'undefined') {
+    window.game = {
+        get player() { return player; },
+        get enemies() { return enemies; },
+        get gameState() { return gameState; },
+        get score() { return score; },
+        get config() { return config; },
+        setGameState: setTestState
+    };
 }
-
 
 export const images = {
     player: typeof Image !== 'undefined' ? new Image() : null,
@@ -69,37 +60,96 @@ export function setTestState(state) {
 export async function loadLevel(levelPath) {
     try {
         const response = await fetch(levelPath);
-        currentLevelData = await response.json();
+        const levelData = await response.json();
+        currentLevelData = levelData;
+        
+        const groundLevel = levelData.groundLevel || config.groundLevel;
         
         enemies.length = 0;
         currentLevelData.enemies.forEach(enemyData => {
-            enemies.push({
-                x: enemyData.x,
-                y: canvas.height - config.groundLevel - 50,
-                width: 50,
-                height: 50,
-                vx: -2,
-                type: enemyData.type,
-                isDead: false
-            });
+            const enemy = new Entity(
+                enemyData.x,
+                canvas.height - groundLevel - 50,
+                50,
+                50
+            );
+            enemy.vx = -2;
+            enemy.type = enemyData.type;
+            enemy.isDead = false;
+            enemy.image = images.zombie;
+            enemies.push(
+                enemy
+            );
         });
         
         player.x = 100;
-        player.x = 100;
         player.y = 300;
+        player.vx = 0;
         player.vy = 0;
+        player.isDead = false;
+        player.isGrounded = false;
         level.width = currentLevelData.width;
     } catch (error) {
         console.error("Failed to load level:", error);
     }
 }
 
-export async function init() {
-    if (!canvas || !ctx) return;
-    canvas.width = config.canvasWidth;
-    canvas.height = config.canvasHeight;
-    
-    await loadLevel('assets/levels/level1.json');
+export function checkCollisions() {
+    if (!currentLevelData || !canvas) return;
+
+    const groundLevel = currentLevelData.groundLevel || config.groundLevel;
+
+    if (currentLevelData.pits) {
+        currentLevelData.pits.forEach(pit => {
+            if (
+                player.x < pit.x + pit.width &&
+                player.x + player.width > pit.x &&
+                player.y + player.height > canvas.height - groundLevel
+            ) {
+                gameState = 'gameover';
+            }
+        });
+    }
+
+    if (currentLevelData.spikes) {
+        currentLevelData.spikes.forEach(spike => {
+            const isColliding = (
+                player.x < spike.x + spike.width &&
+                player.x + player.width > spike.x &&
+                player.y < spike.y + spike.height &&
+                player.y + player.height > spike.y
+            );
+            if (isColliding) {
+                gameState = 'gameover';
+            }
+        });
+    }
+
+    enemies.forEach(enemy => {
+        if (enemy.isDead) return;
+
+        const isColliding = (
+            player.x < enemy.x + enemy.width &&
+            player.x + player.width > enemy.x &&
+            player.y < enemy.y + enemy.height &&
+            player.y + player.height > enemy.y
+        );
+
+        if (isColliding) {
+            const isHittingFromAbove = player.vy > 0 && 
+                                     player.y + player.height < enemy.y + 25 && 
+                                     player.y + player.height > enemy.y;
+
+            if (isHittingFromAbove) {
+                enemy.isDead = true;
+                player.vy = config.jumpStrength * 0.7;
+                score += 10;
+                if (scoreElement) scoreElement.innerText = score;
+            } else {
+                gameState = 'gameover';
+            }
+        }
+    });
 }
 
 export function update() {
@@ -120,70 +170,23 @@ export function update() {
     }
 
     player.vy += config.gravity;
-    player.x += player.vx;
-    player.y += player.vy;
+    player.update();
 
-    const currentGroundY = canvas.height - config.groundLevel;
+    const currentGroundY = canvas.height - (currentLevelData.groundLevel || config.groundLevel);
     if (player.y + player.height > currentGroundY) {
         player.y = currentGroundY - player.height;
         player.vy = 0;
         player.isGrounded = true;
     }
 
-    if (currentLevelData && currentLevelData.pits) {
-        currentLevelData.pits.forEach(pit => {
-            if (
-                player.x < pit.x + pit.width &&
-                player.x + player.width > pit.x &&
-                player.y + player.height > canvas.height - config.groundLevel
-            ) {
-                gameState = 'gameover';
-            }
-        });
-    }
-
-    if (currentLevelData && currentLevelData.spikes) {
-        currentLevelData.spikes.forEach(spike => {
-            const isColliding = (
-                player.x < spike.x + spike.width &&
-                player.x + player.width > spike.x &&
-                player.y < spike.y + spike.height &&
-                player.y + player.height > spike.y
-            );
-            if (isColliding) {
-                gameState = 'gameover';
-            }
-        });
-    }
-
     enemies.forEach(enemy => {
-        if (enemy.isDead) return;
-
-        enemy.x += enemy.vx;
-        if (enemy.x < 0) enemy.x = 0;
-
-        const isColliding = (
-            player.x < enemy.x + enemy.width &&
-            player.x + player.width > enemy.x &&
-            player.y < enemy.y + enemy.height &&
-            player.y + player.height > enemy.y
-        );
-
-        if (isColliding) {
-            const isHittingFromAbove = player.vy > 0 && 
-                                     player.y + player.height < enemy.y + 25 && 
-                                      player.y + player.height > enemy.y;
-
-            if (isHittingFromAbove) {
-                enemy.isDead = true;
-                player.vy = config.jumpStrength * 0.7;
-                score += 10;
-                if (scoreElement) scoreElement.innerText = score;
-            } else {
-                gameState = 'gameover';
-            }
+        if (!enemy.isDead) {
+            enemy.update();
+            if (enemy.x < 0) enemy.x = 0;
         }
     });
+
+    checkCollisions();
 
     if (keys['KeyR']) {
         location.reload();
@@ -199,28 +202,30 @@ export function draw() {
     ctx.save();
     ctx.translate(-cameraX, 0);
 
+    const groundLevel = currentLevelData?.groundLevel || config.groundLevel;
+
     ctx.fillStyle = '#8B4513';
-    ctx.fillRect(0, canvas.height - config.groundLevel, level.width, config.groundLevel);
+    ctx.fillRect(0, canvas.height - groundLevel, level.width, groundLevel);
 
     if (currentLevelData && currentLevelData.pits) {
         ctx.fillStyle = '#87CEEB';
         currentLevelData.pits.forEach(pit => {
-            ctx.fillRect(pit.x, canvas.height - config.groundLevel, pit.width, config.groundLevel);
+            ctx.fillRect(pit.x, canvas.height - groundLevel, pit.width, groundLevel);
         });
     }
 
     if (currentLevelData && currentLevelData.spikes) {
         ctx.fillStyle = 'red';
         currentLevelData.spikes.forEach(spike => {
-            ctx.fillRect(spike.x, canvas.height - config.groundLevel - spike.height, spike.width, spike.height);
+            ctx.fillRect(spike.x, canvas.height - groundLevel - spike.height, spike.width, spike.height);
         });
     }
 
-    ctx.drawImage(images.player, player.x, player.y, player.width, player.height);
+    player.draw(ctx);
 
     enemies.forEach(enemy => {
         if (!enemy.isDead) {
-            ctx.drawImage(images.zombie, enemy.x, enemy.y, enemy.width, enemy.height);
+            enemy.draw(ctx);
         }
     });
 
