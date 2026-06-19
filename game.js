@@ -156,6 +156,34 @@ export function update() {
         });
     }
 
+    enemies.forEach(enemy => {
+        if (enemy.isDead) return;
+
+        enemy.x += enemy.vx;
+        if (enemy.x < 0) enemy.x = 0;
+
+        const isColliding = (
+            player.x < enemy.x + enemy.width &&
+            player.x + player.width > enemy.x &&
+            player.y < enemy.y + enemy.height &&
+            player.y + player.height > enemy.y
+        );
+
+        if (isColliding) {
+            const isHittingFromAbove = player.vy > 0 && 
+                                     player.y + player.height < enemy.y + 25 && 
+                                      player.y + player.height > enemy.y;
+
+            if (isHittingFromAbove) {
+                enemy.isDead = true;
+                player.vy = config.jumpStrength * 0.7;
+                score += 10;
+                if (scoreElement) scoreElement.innerText = score;
+            } else {
+                gameState = 'gameover';
+            }
+        }
+    });
 
     if (keys['KeyR']) {
         location.reload();
