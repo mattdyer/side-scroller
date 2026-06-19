@@ -1,4 +1,8 @@
 # Agent Instructions
+- Try to avoid thinking in circles
+  1. Action is better than a lot of thinking
+  2. Make changes run tests
+  3. Do this over and over until the project is done
 
 ## Core Workflow
 - **Testing First**: Write and run tests before writing any code (follow the red/green loop).
