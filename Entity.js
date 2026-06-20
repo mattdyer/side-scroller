@@ -5,6 +5,7 @@ export class Entity {
         this.width = width;
         this.height = height;
         this.vx = 0;
+        this.vx_target = 0;
         this.vy = 0;
         this.isGrounded = false;
         this.isDead = false;

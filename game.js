@@ -30,7 +30,9 @@ if (typeof window !== 'undefined') {
         get gameState() { return gameState; },
         get score() { return score; },
         get config() { return config; },
-        setGameState: setTestState
+        setGameState: setTestState,
+        resetGameState: resetGameState,
+        loadLevel: loadLevel
     };
 }
 
@@ -57,30 +59,50 @@ export function setTestState(state) {
     if (state.scoreElement !== undefined) scoreElement = state.scoreElement;
 }
 
+export function resetGameState() {
+    player.x = 100;
+    player.y = 300;
+    player.vx = 0;
+    player.vy = 0;
+    player.isDead = false;
+    player.isGrounded = false;
+    enemies.length = 0;
+    currentLevelData = null;
+    gameState = 'playing';
+    score = 0;
+    level.width = 3000;
+    keys = {};
+    if (scoreElement) scoreElement.innerText = '0';
+}
+
+
 export async function loadLevel(levelPath) {
     try {
         const response = await fetch(levelPath);
         const levelData = await response.json();
         currentLevelData = levelData;
         
+        const canvasHeight = canvas ? canvas.height : config.canvasHeight;
         const groundLevel = levelData.groundLevel || config.groundLevel;
         
         enemies.length = 0;
-        currentLevelData.enemies.forEach(enemyData => {
-            const enemy = new Entity(
-                enemyData.x,
-                canvas.height - groundLevel - 50,
-                50,
-                50
-            );
-            enemy.vx = -2;
-            enemy.type = enemyData.type;
-            enemy.isDead = false;
-            enemy.image = images.zombie;
-            enemies.push(
-                enemy
-            );
-        });
+        if (levelData.enemies) {
+            levelData.enemies.forEach(enemyData => {
+                const enemy = new Entity(
+                    enemyData.x,
+                    canvasHeight - groundLevel - 50,
+                    50,
+                    50
+                );
+                enemy.vx = -2;
+                enemy.type = enemyData.type;
+                enemy.isDead = false;
+                enemy.image = images.zombie;
+                enemies.push(
+                    enemy
+                );
+            });
+        }
         
         player.x = 100;
         player.y = 300;
@@ -88,15 +110,16 @@ export async function loadLevel(levelPath) {
         player.vy = 0;
         player.isDead = false;
         player.isGrounded = false;
-        level.width = currentLevelData.width;
+        level.width = levelData.width;
     } catch (error) {
         console.error("Failed to load level:", error);
     }
 }
 
 export function checkCollisions() {
-    if (!currentLevelData || !canvas) return;
+    if (!currentLevelData) return;
 
+    const canvasHeight = canvas ? canvas.height : config.canvasHeight;
     const groundLevel = currentLevelData.groundLevel || config.groundLevel;
 
     if (currentLevelData.pits) {
@@ -104,7 +127,7 @@ export function checkCollisions() {
             if (
                 player.x < pit.x + pit.width &&
                 player.x + player.width > pit.x &&
-                player.y + player.height > canvas.height - groundLevel
+                player.y + player.height > canvasHeight - groundLevel
             ) {
                 gameState = 'gameover';
             }
@@ -158,8 +181,10 @@ export function update() {
 
     if (keys['ArrowLeft']) {
         player.vx = -config.moveSpeed;
+        player.isGrounded = false; // Added to ensure movement doesn't accidentally set grounded
     } else if (keys['ArrowRight']) {
         player.vx = config.moveSpeed;
+        player.isGrounded = false;
     } else {
         player.vx = 0;
     }
@@ -172,7 +197,8 @@ export function update() {
     player.vy += config.gravity;
     player.update();
 
-    const currentGroundY = canvas.height - (currentLevelData.groundLevel || config.groundLevel);
+    const canvasHeight = canvas ? canvas.height : config.canvasHeight;
+    const currentGroundY = canvasHeight - (currentLevelData.groundLevel || config.groundLevel);
     if (player.y + player.height > currentGroundY) {
         player.y = currentGroundY - player.height;
         player.vy = 0;
@@ -180,10 +206,9 @@ export function update() {
     }
 
     enemies.forEach(enemy => {
-        if (!enemy.isDead) {
-            enemy.update();
-            if (enemy.x < 0) enemy.x = 0;
-        }
+        if (enemy.isDead) return;
+        enemy.update();
+        if (enemy.x < 0) enemy.x = 0;
     });
 
     checkCollisions();
@@ -229,5 +254,5 @@ export function draw() {
         }
     });
 
-    ctx.restore();
+    ctx.restore;
 }
