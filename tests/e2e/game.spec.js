@@ -16,7 +16,7 @@ test.describe('Game End-to-End Tests', () => {
         await page.waitForFunction(() => window.game !== undefined);
         
         // Manually trigger level load and setup player
-        await page.evaluate(async () => {
+        await page.evaluate(async ()	=> {
             await window.game.loadLevel('assets/levels/level1.json');
             // In level1, zombie is at x: 1000, y: 500.
             // Player needs to be positioned to jump on it.
@@ -45,6 +45,6 @@ test.describe('Game End-to-End Tests', () => {
         await page.waitForTimeout(3000);
 
         const gameState = await page.evaluate(() => window.game.gameState);
-        expect(auc_gameState).toBe('gameover');
+        expect(gameState).toBe('gameover');
     });
 });

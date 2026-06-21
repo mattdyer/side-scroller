@@ -52,37 +52,38 @@ Call log:
   16 |         await page.waitForFunction(() => window.game !== undefined);
   17 |         
   18 |         // Manually trigger level load and setup player
-  19 |         await page.evaluate(async () => {
+  19 |         await page.evaluate(async ()	=> {
   20 |             await window.game.loadLevel('assets/levels/level1.json');
-  21 |             // We need to make sure player starts above the enemy to allow a jump/fall
-  22 |             window.game.player.x = 1000;
-  23 |             window.game.player.y = 400;
-  24 |             window.game.player.vy = -15;
-  25 |         });
-  26 |         
-  27 |         // Wait for the jump and fall to complete
-  28 |         await page.waitForTimeout(3000);
-  29 | 
-  30 |         const scoreElement = page.locator('#score');
-> 31 |         await expect(scoreElement).toHaveText('10');
+  21 |             // In level1, zombie is at x: 1000, y: 500.
+  22 |             // Player needs to be positioned to jump on it.
+  23 |             window.game.player.x = 1000;
+  24 |             window.game.player.y = 400;
+  25 |             window.game.player.vy = -15;
+  26 |         });
+  27 |         
+  28 |         // Wait for the jump and fall to complete
+  29 |         await page.waitForTimeout(3000);
+  30 | 
+  31 |         const scoreElement = page.locator('#score');
+> 32 |         await expect(scoreElement).toHaveText('10');
      |                                    ^ Error: expect(locator).toHaveText(expected) failed
-  32 |     });
-  33 | 
-  34 |     test('should trigger gameover when falling in a pit', async ({ page }) => {
-  35 |         await page.waitForFunction(() => window.game !== undefined);
-  36 |         await page.evaluate(async () => {
-  37 |             await window.game.loadLevel('assets/levels/level1.json');
-  38 |             // We need to make sure player starts above the pit
-  39 |             window.game.player.x = 550;
-  40 |             window.game.player.y = 300;
-  41 |         });
-  42 |         
-  43 |         // Wait for player to fall into the pit
-  44 |         await page.waitForTimeout(3000);
-  45 | 
-  46 |         const gameState = await page.evaluate(() => window.game.gameState);
-  47 |         expect(gameState).toBe('gameover');
-  48 |     });
-  49 | });
-  50 | 
+  33 |     });
+  34 | 
+  35 |     test('should trigger gameover when falling in a pit', async ({ page }) => {
+  36 |         await page.waitForFunction(() => window.game !== undefined);
+  37 |         await page.evaluate(async () => {
+  38 |             await window.game.loadLevel('assets/levels/level1.json');
+  39 |             // In level1, pit is at x: 500, width: 100.
+  40 |             window.game.player.x = 550;
+  41 |             window.game.player.y = 300;
+  42 |         });
+  43 |         
+  44 |         // Wait for player to fall into the pit
+  45 |         await page.waitForTimeout(3000);
+  46 | 
+  47 |         const gameState = await page.evaluate(() => window.game.gameState);
+  48 |         expect(gameState).toBe('gameover');
+  49 |     });
+  50 | });
+  51 | 
 ```
