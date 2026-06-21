@@ -6,29 +6,25 @@
 
 # Test info
 
-- Name: game.spec.js >> Game End-to-End Tests >> should update score when jumping on an enemy
-- Location: tests/e2e/game.spec.js:15:5
+- Name: game.spec.js >> Game End-to-End Tests >> should trigger gameover when falling in a pit
+- Location: tests/e2e/game.spec.js:34:5
 
 # Error details
 
 ```
-Error: expect(locator).toHaveText(expected) failed
+Error: expect(received).toBe(expected) // Object.is equality
 
-Locator:  locator('#score')
-Expected: "10"
-Received: "0"
-Timeout:  5000ms
-
-Call log:
-  - Expect "toHaveText" with timeout 5000ms
-  - waiting for locator('#score')
-    14 × locator resolved to <span id="score">0</span>
-       - unexpected value "0"
-
+Expected: "gameover"
+Received: "playing"
 ```
 
+# Page snapshot
+
 ```yaml
-- text: "0"
+- generic [active] [ref=e1]:
+  - generic: "Score: 0"
+  - generic: Arrows to Move | Space to Jump | F to Fullscreen
+  - button "Fullscreen" [ref=e2] [cursor=pointer]
 ```
 
 # Test source
@@ -64,8 +60,7 @@ Call log:
   28 |         await page.waitForTimeout(3000);
   29 | 
   30 |         const scoreElement = page.locator('#score');
-> 31 |         await expect(scoreElement).toHaveText('10');
-     |                                    ^ Error: expect(locator).toHaveText(expected) failed
+  31 |         await expect(scoreElement).toHaveText('10');
   32 |     });
   33 | 
   34 |     test('should trigger gameover when falling in a pit', async ({ page }) => {
@@ -81,7 +76,8 @@ Call log:
   44 |         await page.waitForTimeout(3000);
   45 | 
   46 |         const gameState = await page.evaluate(() => window.game.gameState);
-  47 |         expect(gameState).toBe('gameover');
+> 47 |         expect(gameState).toBe('gameover');
+     |                           ^ Error: expect(received).toBe(expected) // Object.is equality
   48 |     });
   49 | });
   50 | 

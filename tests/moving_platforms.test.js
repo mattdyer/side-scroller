@@ -1,4 +1,4 @@
-import { it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach } from 'vitest';
 import { player, enemies, gameState, score, keys, setTestState, update, checkCollisions, config } from '../game.js';
 
 describe('Moving Platforms', () => {

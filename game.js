@@ -116,8 +116,7 @@ export async function loadLevel(levelPath) {
                     platformData.width,
                     platformData.height
                 );
-                platform.vx = platform
-                    .vx || 0;
+                platform.vx = platformData.vx || 0;
                 platform.range = platformData.range || 0;
                 platform.startX = platformData.startX || platformData.x;
                 platform.color = 'gray';
@@ -246,4 +245,58 @@ export function update() {
     if (keys['KeyR']) {
         location.reload();
     }
+}
+
+export function draw() {
+    if (!ctx) return;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    const cameraX = Math.max(0, Math.min(player.x - canvas.width / 2, level.width - canvas.width));
+
+    ctx.save();
+    ctx.translate(-cameraX, 0);
+
+    const groundLevel = currentLevelData?.groundLevel || config.groundLevel;
+
+    ctx.fillStyle = '#8B4513';
+    ctx.fillRect(0, canvas.height - groundLevel, level.width, groundLevel);
+
+    if (currentLevelData && currentLevelData.pits) {
+        ctx.fillStyle = '#87CEEB';
+        currentLevelData.pits.forEach(pit => {
+            ctx.fillRect(pit.x, canvas.height - groundLevel, pit.width, groundLevel);
+        });
+    }
+
+    if (currentLevelData && currentLevelData.spikes) {
+        ctx.fillStyle = 'red';
+        currentLevelData.spikes.forEach(spike => {
+            ctx.fillRect(spike.x, canvas.height - groundLevel - spike.height, spike.width, spike.height);
+        });
+    }
+
+    if (currentLevelData && currentLevelData.platforms) {
+        currentLevelData.platforms.forEach(platform => {
+            platform.draw(ctx);
+        });
+    }
+
+    player.draw(ctx);
+
+    enemies.forEach(enemy => {
+        if (!enemy.isDead) {
+            enemy.draw(ctx);
+        }
+    });
+
+    ctx.restore;
+}
+
+if (typeof window !== 'undefined') {
+    function gameLoop() {
+        update();
+        draw();
+        requestAnimationFrame(gameLoop);
+    }
+    gameLoop();
 }
