@@ -13,6 +13,7 @@ export const player = new Entity(10.0, 300, 50, 50);
 player.image = typeof Image !== 'undefined' ? new Image() : null;
 
 export const enemies = [];
+export let platforms = [];
 
 export const level = {
     width: 3000
@@ -54,6 +55,10 @@ export function setTestState(state) {
         enemies.length = 0;
         state.enemies.forEach(e => enemies.push(e));
     }
+    if (state.platforms !== undefined) {
+        platforms.length = 0;
+        state.platforms.forEach(p => platforms.push(p));
+    }
     if (state.canvas !== undefined) canvas = state.canvas;
     if (state.ctx !== undefined) ctx = state.ctx;
     if (state.scoreElement !== undefined) scoreElement = state.scoreElement;
@@ -67,6 +72,7 @@ export function resetGameState() {
     player.isDead = false;
     player.isGrounded = false;
     enemies.length = 0;
+    platforms.length = 0;
     currentLevelData = null;
     gameState = 'playing';
     score = 0;
@@ -86,6 +92,7 @@ export async function loadLevel(levelPath) {
         const groundLevel = levelData.groundLevel || config.groundLevel;
         
         enemies.length = 0;
+        platforms.length = 0;
         if (levelData.enemies) {
             levelData.enemies.forEach(enemyData => {
                 const enemy = new Entity(
@@ -98,9 +105,23 @@ export async function loadLevel(levelPath) {
                 enemy.type = enemyData.type;
                 enemy.isDead = false;
                 enemy.image = images.zombie;
-                enemies.push(
-                    enemy
+                enemies.push(enemy);
+            });
+        }
+        if (levelData.platforms) {
+            levelData.platforms.forEach(platformData => {
+                const platform = new Entity(
+                    platformData.x,
+                    platformData.y,
+                    platformData.width,
+                    platformData.height
                 );
+                platform.vx = platform
+                    .vx || 0;
+                platform.range = platformData.range || 0;
+                platform.startX = platformData.startX || platformData.x;
+                platform.color = 'gray';
+                platforms.push(platform);
             });
         }
         
@@ -181,7 +202,7 @@ export function update() {
 
     if (keys['ArrowLeft']) {
         player.vx = -config.moveSpeed;
-        player.isGrounded = false; // Added to ensure movement doesn't accidentally set grounded
+        player.isGrounded = false;
     } else if (keys['ArrowRight']) {
         player.vx = config.moveSpeed;
         player.isGrounded = false;
@@ -205,6 +226,15 @@ export function update() {
         player.isGrounded = true;
     }
 
+    platforms.forEach(platform => {
+        if (platform.vx !== 0) {
+            platform.x += platform.vx;
+            if (Math.abs(platform.x - platform.startX) > platform.range) {
+                platform.vx = -platform.vx;
+            }
+        }
+    });
+
     enemies.forEach(enemy => {
         if (enemy.isDead) return;
         enemy.update();
@@ -216,43 +246,4 @@ export function update() {
     if (keys['KeyR']) {
         location.reload();
     }
-}
-
-export function draw() {
-    if (!ctx) return;
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    const cameraX = Math.max(0, Math.min(player.x - canvas.width / 2, level.width - canvas.width));
-
-    ctx.save();
-    ctx.translate(-cameraX, 0);
-
-    const groundLevel = currentLevelData?.groundLevel || config.groundLevel;
-
-    ctx.fillStyle = '#8B4513';
-    ctx.fillRect(0, canvas.height - groundLevel, level.width, groundLevel);
-
-    if (currentLevelData && currentLevelData.pits) {
-        ctx.fillStyle = '#87CEEB';
-        currentLevelData.pits.forEach(pit => {
-            ctx.fillRect(pit.x, canvas.height - groundLevel, pit.width, groundLevel);
-        });
-    }
-
-    if (currentLevelData && currentLevelData.spikes) {
-        ctx.fillStyle = 'red';
-        currentLevelData.spikes.forEach(spike => {
-            ctx.fillRect(spike.x, canvas.height - groundLevel - spike.height, spike.width, spike.height);
-        });
-    }
-
-    player.draw(ctx);
-
-    enemies.forEach(enemy => {
-        if (!enemy.isDead) {
-            enemy.draw(ctx);
-        }
-    });
-
-    ctx.restore;
 }

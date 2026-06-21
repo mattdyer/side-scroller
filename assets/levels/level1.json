@@ -1,17 +1,13 @@
 {
-  "width": 3000,
-  "groundLevel": 50,
-  "enemies": [
-    { "x": 600, "y": 450, "type": "zombie" },
-    { "x": 900, "y": 450, "type": "zombie" },
-    { "x": 1300, "y": 450, "type": "zombie" },
-    { "x": 1700, "y": 450, "type": "zombie" },
-    { "x": 2100, "y": 450, "type": "zombie" }
-  ],
-  "pits": [
-    { "x": 1500, "width": 200 }
-  ],
-  "spikes": [
-    { "x": 1000, "y": 500, "width": 40, "height": 0 }
-  ]
+    "width": 3000,
+    "groundLevel": 50,
+    "pits": [
+        { "x": 500, "width": 100 }
+    ],
+    "spikes": [
+        { "x": 800, "y": 500, "width": 50, "height": 50 }
+    ],
+    "enemies": [
+        { "x": 1000, "y": 500, "type": "zombie" }
+    ]
 }
