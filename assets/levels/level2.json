@@ -1,1 +1,8 @@
-{"width": 2000, "enemies": [], "pits": [], "spikes": []}
+{
+    "width": 2000,
+    "groundLevel": 50,
+    "enemies": [],
+    "pits": [],
+    "spikes": [],
+    "finishLineX": 1800
+}

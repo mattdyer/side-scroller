@@ -9,5 +9,6 @@
     ],
     "enemies": [
         { "x": 1000, "y": 500, "type": "zombie" }
-    ]
+    ],
+    "finishLineX": 2800
 }

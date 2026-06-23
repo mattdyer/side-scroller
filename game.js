@@ -16,8 +16,13 @@ export const enemies = [];
 export let platforms = [];
 
 export const level = {
-    width: 3000
+    width: 3000,
+    finishLineX: 0,
+    index: 0
 };
+
+const levels = ['assets/levels/level1.json', 'assets/levels/level2.json'];
+let isTransitioning = false;
 
 export let currentLevelData = null;
 export let gameState = 'playing';
@@ -138,6 +143,7 @@ export async function loadLevel(levelPath) {
         player.isDead = false;
         player.isGrounded = false;
         level.width = levelData.width;
+        level.finishLineX = levelData.finishLineX;
     } catch (error) {
         console.error("Failed to load level:", error);
     }
@@ -202,7 +208,7 @@ export function checkCollisions() {
     });
 }
 
-export function update() {
+export async function update() {
     if (gameState !== 'playing') return;
     if (!currentLevelData) return;
 
@@ -260,6 +266,20 @@ export function update() {
     if (keys['KeyR']) {
         location.reload();
     }
+
+    if (currentLevelData && player.x >= currentLevelData.finishLineX && !isTransitioning) {
+        isTransitioning = true;
+        level.index++;
+        if (level.index < levels.length) {
+            loadLevel(levels[level.index]).then(() => {
+                isTransitioning = false;
+            });
+        } else {
+            gameState = 'gameover';
+            isTransitioning = false;
+        }
+    }
+
 }
 
 export function draw() {
