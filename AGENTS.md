@@ -7,6 +7,7 @@
 ## Core Workflow
 - **Testing First**: Write and run tests before writing any code (follow the red/green loop).
 - **Testing Command**: `npm test` (uses Vitest).
+- **Linting Command**: `npm lint` (uses eslint).
 - **Test Loop**: 
   1. Write a failing test.
   2. Write code that passes the test.
