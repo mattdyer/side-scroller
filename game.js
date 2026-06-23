@@ -1,5 +1,5 @@
 import { Entity } from './Entity.js';
-
+console.log('BROWSER_CONSOLE: game.js loading');
 export const config = {
     gravity: 0.5,
     jumpStrength: -12,
@@ -25,6 +25,7 @@ export let score = 0;
 export let keys = {};
 
 if (typeof window !== 'undefined') {
+    scoreElement = document.getElementById('score');
     window.game = {
         get player() { return player; },
         get enemies() { return enemies; },
@@ -35,6 +36,7 @@ if (typeof window !== 'undefined') {
         resetGameState: resetGameState,
         loadLevel: loadLevel
     };
+    console.log('BROWSER_CONSOLE: window.game initialized');
 }
 
 export const images = {
@@ -84,6 +86,9 @@ export function resetGameState() {
 
 export async function loadLevel(levelPath) {
     try {
+        if (typeof window !== 'undefined') {
+            scoreElement = document.getElementById('score');
+        }
         const response = await fetch(levelPath);
         const levelData = await response.json();
         currentLevelData = levelData;
@@ -219,10 +224,18 @@ export function update() {
 
     const canvasHeight = canvas ? canvas.height : config.canvasHeight;
     const currentGroundY = canvasHeight - (currentLevelData.groundLevel || config.groundLevel);
-    if (player.y + player.height > currentGroundY) {
+
+    const isOverPit = currentLevelData.pits?.some(pit => 
+        player.x < pit.x + pit.width &&
+        player.x + player.width > pit.x
+    ) ?? false;
+
+    if (!isOverPit && player.y + player.height > currentGroundY) {
         player.y = currentGroundY - player.height;
         player.vy = 0;
         player.isGrounded = true;
+    } else if (isOverPit && player.y + player.height > currentGroundY) {
+        player.isGrounded = false;
     }
 
     platforms.forEach(platform => {

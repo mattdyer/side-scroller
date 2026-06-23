@@ -6,8 +6,8 @@
 
 # Test info
 
-- Name: game.spec.js >> Game End-to-End Tests >> should trigger gameover when falling in a pit
-- Location: tests/e2e/game.spec.js:42:5
+- Name: game.spec.js >> Game End-to-End Tests >> should have the correct initial score
+- Location: tests/e2e/game.spec.js:16:5
 
 # Error details
 
