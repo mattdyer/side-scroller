@@ -23,6 +23,10 @@ export let currentLevelData = null;
 export let gameState = 'playing';
 export let score = 0;
 export let keys = {};
+export let scoreElement = null;
+export let canvas = null;
+export let ctx = null;
+
 
 if (typeof window !== 'undefined') {
     scoreElement = document.getElementById('score');
@@ -45,9 +49,6 @@ export const images = {
     zombie: typeof Image !== 'undefined' ? new Image() : null
 };
 
-export let canvas = null;
-export let ctx = null;
-export let scoreElement = null;
 
 export function setTestState(state) {
     if (state.currentLevelData !== undefined) currentLevelData = state.currentLevelData;
