@@ -1,5 +1,5 @@
+console.log('BROWSER_CONSOLE: HELLO');
 import { Entity } from './Entity.js';
-console.log('BROWSER_CONSOLE: game.js loading');
 export const config = {
     gravity: 0.5,
     jumpStrength: -12,
@@ -26,6 +26,7 @@ export let keys = {};
 
 if (typeof window !== 'undefined') {
     scoreElement = document.getElementById('score');
+    console.log('BROWSER_CONSOLE: scoreElement is', scoreElement);
     window.game = {
         get player() { return player; },
         get enemies() { return enemies; },
