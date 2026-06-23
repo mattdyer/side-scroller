@@ -12,6 +12,7 @@ This is a side scrolling game similar to Mario.  You kill enemies by jumping on 
     - If any fail, modify code until they pass
 
 ## Phase 1: Core Engine & Architecture Refactor
+- [ ] Setup Code Linting / Static checking
 - [x] **Unit Testing**:
     - [x] Setup **Vitest** or **Jest** in the repository.
     - [x] Write tests for:
