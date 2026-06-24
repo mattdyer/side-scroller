@@ -29,7 +29,7 @@ test.describe('Game End-to-End Tests', () => {
             // Player needs to be positioned to jump on it.
             window.game.player.x = 1000;
             window.game.player.y = 400;
-            window.game.player.vy = -15;
+            window.game.player.vy = 15;
         });
         
         // Wait for the jump and fall to complete
@@ -51,7 +51,7 @@ test.describe('Game End-to-End Tests', () => {
         
         // Wait for player to fall into the pit
         await page.waitForTimeout(3000);
-
+        
         const gameState = await page.evaluate(() => window.game.gameState);
         expect(gameState).toBe('gameover');
     });
@@ -63,21 +63,24 @@ test.describe('Game End-to-End Tests', () => {
         await page.evaluate(async () => {
             await window.game.loadLevel('assets/levels/level1.json');
         });
-
+    
         // Move player to finish line of level 1 (2800)
         await page.evaluate(async () => {
             window.game.player.x = 2850;
             // We might need a few update ticks
-            for(let i=0; i<5; i++) {
+            for(let i=0; i<20; i++) {
                 await window.game.update();
             }
         });
-
+    
+        // Wait for potential level transition
+        await page.waitForFunction(() => window.game.currentLevelData && window.game.currentLevelData.width === 2000);
+    
         // Check if player.x was reset to 100 (indicating level 2 loaded)
         // Also check if currentLevelData.width is now 2000
         const playerX = await page.evaluate(() => window.game.player.x);
         const levelWidth = await page.evaluate(() => window.game.currentLevelData.width);
-
+    
         expect(playerX).toBe(100);
         expect(levelWidth).toBe(2000);
     });

@@ -1,7 +1,6 @@
 console.log('BROWSER_CONSOLE: HELLO');
 import { Entity } from './Entity.js';
-import { updatePhysics, checkCollisions } from './physics.js';
-export { checkCollisions } from './physics.js';
+import { updatePhysics, checkCollisions as physicsCheckCollisions } from './physics.js';
 export const config = {
     gravity: 0.5,
     jumpStrength: -12,
@@ -44,9 +43,11 @@ if (typeof window !== 'undefined') {
         get gameState() { return gameState; },
         get score() { return score; },
         get config() { return config; },
+        get currentLevelData() { return currentLevelData; },
         setGameState: setTestState,
         resetGameState: resetGameState,
-        loadLevel: loadLevel
+        loadLevel: loadLevel,
+        update: update
     };
     console.log('BROWSER_CONSOLE: window.game initialized');
 }
@@ -88,6 +89,7 @@ export function resetGameState() {
     gameState = 'playing';
     score = 0;
     level.width = 3000;
+    level.index = 0;
     keys = {};
     if (scoreElement) scoreElement.innerText = '0';
 }
@@ -172,7 +174,9 @@ export async function update() {
     }
 
     if (keys['KeyR']) {
-        location.reload();
+        if (typeof window !== 'undefined') {
+            location.reload();
+        }
     }
 
     if (currentLevelData && player.x >= currentLevelData.finishLineX && !isTransitioning) {
@@ -190,13 +194,12 @@ export async function update() {
 }
 
 export function draw() {
-    if (!ctx) return;
+    if (!ctx || !canvas) return;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     const cameraX = Math.max(0, Math.min(player.x - canvas.width / 2, level.width - canvas.width));
 
     ctx.save();
-    ctx.translate(-camera.x, 0); // Wait, cameraX!
     ctx.translate(-cameraX, 0);
 
     const groundLevel = currentLevelData?.groundLevel || config.groundLevel;
