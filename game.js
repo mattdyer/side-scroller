@@ -17,6 +17,7 @@ player.image = typeof Image !== 'undefined' ? new Image() : null;
 export const enemies = [];
 export let projectiles = [];
 export let platforms = [];
+export let powerups = [];
 
 export const level = {
     width: 3000,
@@ -87,6 +88,8 @@ export function resetGameState() {
     player.isGrounded = false;
     enemies.length = 0;
     platforms.length = 0;
+    projectiles.length = 0;
+    powerups.length = 0;
     currentLevelData = null;
     gameState = 'playing';
     score = 0;
@@ -163,7 +166,7 @@ export async function update() {
     if (!currentLevelData) return;
 
     const { scoreUpdate, gameState: physicsGameState } = updatePhysics(
-        { player, enemies, platforms },
+        { player, enemies, platforms, projectiles },
         currentLevelData,
         config,
         keys,

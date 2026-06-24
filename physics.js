@@ -1,3 +1,5 @@
+import { Entity } from './Entity.js';
+
 export function checkCollisions(entities, currentLevelData, config, canvasHeight) {
     const { player, enemies, spikes, pits } = entities;
     if (!currentLevelData) return { scoreUpdate: 0, gameState: 'playing' };
@@ -137,7 +139,22 @@ export function updatePhysics(entities, currentLevelData, config, keys, canvasHe
             }
         }
         
+        if (enemy.type === 'ranged') {
+            // Randomly shoot a projectile
+            if (Math.random() < 0.1) {
+                const projectile = new Entity(enemy.x, enemy.y, 10, 10);
+                projectile.vx = -5;
+                projectile.vy = 0;
+                projectiles.push(projectile);
+            }
+        }
+        
         if (enemy.x < 0) enemy.x = 0;
+    });
+
+    // 6.5. Projectile movement
+    projectiles.forEach(projectile => {
+        projectile.update();
     });
 
     // 7. Collision Detection
