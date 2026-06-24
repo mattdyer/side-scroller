@@ -1,7 +1,7 @@
 import { Entity } from './Entity.js';
 
 export function checkCollisions(entities, currentLevelData, config, canvasHeight) {
-    const { player, enemies, spikes, pits, projectiles, powerups } = entities;
+    const { player, enemies, spikes, pits, platforms, projectiles, powerups } = entities;
     if (!currentLevelData) return { scoreUpdate: 0, gameState: 'playing' };
 
     let scoreUpdate = 0;
@@ -62,11 +62,30 @@ export function checkCollisions(entities, currentLevelData, config, canvasHeight
         }
     });
 
+    // Platforms
+    if (platforms) {
+        platforms.forEach(platform => {
+            const isColliding = (
+                player.x < platform.x + platform.width &&
+                player.x + player.width > platform.x &&
+                player.y < platform.y + platform.height &&
+                player.y + player.height > platform.y
+            );
+            if (isColliding) {
+                if (player.vy > 0 && player.y + player.height < platform.y + platform.height / 2) {
+                    player.y = platform.y - player.height;
+                    player.vy = 0;
+                    player.isGrounded = true;
+                }
+            }
+        });
+    }
+
     return { scoreUpdate, gameState: newState };
 }
 
 export function updatePhysics(entities, currentLevelData, config, keys, canvasHeight) {
-    const { player, enemies, platforms, projectiles } = entities;
+    const { player, enemies, platforms, projectiles, powerups } = entities;
     if (!currentLevelData) return { scoreUpdate: 0, gameState: 'playing' };
 
     let scoreUpdate = 0;
@@ -157,7 +176,12 @@ export function updatePhysics(entities, currentLevelData, config, keys, canvasHe
         projectile.update();
     });
 
-    // 7. Collision Detection
+    // 7. Powerup movement
+    powerups.forEach(powerup => {
+        powerup.update();
+    });
+ 
+    // 8. Collision Detection
     const collisionResult = checkCollisions(entities, currentLevelData, config, canvasHeight);
     scoreUpdate += collisionResult.scoreUpdate;
     if (collisionResult.gameState === 'gameover') {

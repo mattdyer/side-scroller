@@ -1,5 +1,6 @@
 console.log('BROWSER_CONSOLE: HELLO');
 import { Entity } from './Entity.js';
+export { Entity };
 import { updatePhysics, checkCollisions as physicsCheckCollisions } from './physics.js';
 export { checkCollisions } from './physics.js';
 export const config = {
@@ -147,6 +148,23 @@ export async function loadLevel(levelPath) {
                 platforms.push(platform);
             });
         }
+
+        if (levelData.powerups) {
+            levelData.powerups.forEach(powerupData => {
+                const powerup = new Entity(
+                    powerupData.x,
+                    powerupData.y,
+                    powerupData.width,
+                    powerupData.height
+                );
+                powerup.type = powerupData.type;
+                powerup.color = 'gold';
+                powerups.push(powerup);
+            });
+        }
+
+        projectiles.length = 0;
+        powerups.length = 0;
         
         player.x = 100;
         player.y = 300;
@@ -166,7 +184,7 @@ export async function update() {
     if (!currentLevelData) return;
 
     const { scoreUpdate, gameState: physicsGameState } = updatePhysics(
-        { player, enemies, platforms, projectiles },
+        { player, enemies, platforms, projectiles, powerups },
         currentLevelData,
         config,
         keys,
