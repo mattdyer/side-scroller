@@ -1,7 +1,7 @@
 import { Entity } from './Entity.js';
 
 export function checkCollisions(entities, currentLevelData, config, canvasHeight) {
-    const { player, enemies, spikes, pits } = entities;
+    const { player, enemies, spikes, pits, projectiles, powerups } = entities;
     if (!currentLevelData) return { scoreUpdate: 0, gameState: 'playing' };
 
     let scoreUpdate = 0;
