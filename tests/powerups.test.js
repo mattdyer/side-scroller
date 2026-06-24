@@ -17,7 +17,7 @@ describe('Powerups', () => {
             },
             score: 0,
             gameState: 'playing',
-            keys: {},
+            keys: { ArrowRight: true },
             canvas: { height: 600 }
         });
 
@@ -41,7 +41,9 @@ describe('Powerups', () => {
 
         // Check if powerup was removed (it should be removed if collision was handled)
         // Wait, I haven't implemented removal yet.
-        // For now, let's just check if the player's component is set.
-        expect(player.components.speedBoostTimer).toBeDefined();
+        // Check if the timer is active and then starts decreasing
+        expect(player.components.speedBoostTimer).toBe(300);
+        await game.update();
+        expect(player.components.speedBoostTimer).toBe(299);
     });
 });

@@ -81,6 +81,25 @@ export function checkCollisions(entities, currentLevelData, config, canvasHeight
         });
     }
 
+    // Powerups
+    if (powerups) {
+        for (let i = powerups.length - 1; i >= 0; i--) {
+            const powerup = powerups[i];
+            const isColliding = (
+                player.x < powerup.x + powerup.width &&
+                player.x + player.width > powerup.x &&
+                player.y < powerup.y + powerup.height &&
+                player.y + player.height > powerup.y
+            );
+            if (isColliding) {
+                if (powerup.type === 'speed') {
+                    player.components.speedBoostTimer = 300;
+                }
+                powerups.splice(i, 1);
+            }
+        }
+    }
+
     return { scoreUpdate, gameState: newState };
 }
 
@@ -101,6 +120,12 @@ export function updatePhysics(entities, currentLevelData, config, keys, canvasHe
         player.isGrounded = false;
     } else {
         player.vx = 0;
+    }
+
+    // 1.5 Apply Powerups
+    if (player.components.speedBoostTimer > 0) {
+        player.components.speedBoostTimer--;
+        player.vx += 5;
     }
 
     // 2. Player jump
