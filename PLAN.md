@@ -33,10 +33,10 @@ This is a side scrolling game similar to Mario.  You kill enemies by jumping on 
 
 
 ## Phase 2: Environment & Level Design
-- [ ] **Level Schema Definition**: Define a structure for platforms, gaps, and hazards.
+- [x] **Level Schema Definition**: Define a structure for platforms, gaps, and hazards.
 - [ ] **Obstacle Implementation**:
-    - [ ] **Pits**: Trigger `gameover` state when player Y-coordinate exceeds ground level.
-    - [ ] **Spikes**: Static hazards that trigger damage.
+    - [x] **Pits**: Trigger `gameover` state when player Y-coordinate exceeds ground level.
+    - [x] **Spikes**: Static hazards that trigger damage.
     - [ ] **Moving Platforms**: Platforms that follow a predefined path.
 - [ ] **Level Progression**: Implement a level transition system (Level 1 $\rightarrow$ Level 2, etc.).
 - [ ] *Note: Ensure tests are written and run for each step.*
