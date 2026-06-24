@@ -117,12 +117,26 @@ export function updatePhysics(entities, currentLevelData, config, keys, canvasHe
                 platform.vx = -platform.vx;
             }
         }
+        if (platform.vy !== 0) {
+            platform.y += platform.vy;
+            if (Math.abs(platform.y - platform.startY) > platform.rangeY) {
+                platform.vy = -platform.vy;
+            }
+        }
     });
 
     // 6. Enemy movement
     enemies.forEach(enemy => {
         if (enemy.isDead) return;
         enemy.update();
+        
+        if (enemy.type === 'flyer') {
+            // Simple vertical oscillation for flyer
+            if (enemy.y < 200 || enemy.y > 400) {
+                enemy.vy = -enemy.vy;
+            }
+        }
+        
         if (enemy.x < 0) enemy.x = 0;
     });
 

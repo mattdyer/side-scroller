@@ -1,6 +1,7 @@
 console.log('BROWSER_CONSOLE: HELLO');
 import { Entity } from './Entity.js';
 import { updatePhysics, checkCollisions as physicsCheckCollisions } from './physics.js';
+export { checkCollisions } from './physics.js';
 export const config = {
     gravity: 0.5,
     jumpStrength: -12,
@@ -14,6 +15,7 @@ export const player = new Entity(10.0, 300, 50, 50);
 player.image = typeof Image !== 'undefined' ? new Image() : null;
 
 export const enemies = [];
+export let projectiles = [];
 export let platforms = [];
 
 export const level = {
@@ -133,8 +135,11 @@ export async function loadLevel(levelPath) {
                     platformData.height
                 );
                 platform.vx = platformData.vx || 0;
+                platform.vy = platformData.vy || 0;
                 platform.range = platformData.range || 0;
-                platform.startX = platformData.startX || platformData.x;
+                platform.rangeY = platformData.rangeY || 0;
+                platform.startX = platformData.x;
+                platform.startY = platformData.y;
                 platform.color = 'gray';
                 platforms.push(platform);
             });

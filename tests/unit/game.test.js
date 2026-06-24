@@ -1,5 +1,5 @@
 import { expect, test } from 'vitest';
-import { player, checkCollisions, gameState, setTestState } from '../../game.js';
+import { player, checkCollisions, gameState, setTestState, update } from '../../game.js';
 
 test('player should be initialized', () => {
     expect(player).toBeDefined();
@@ -25,7 +25,7 @@ test('collision with pit should trigger gameover', async () => {
     player.y = 750; // Deep enough in the pit
     player.vy = 20;
 
-    checkCollisions();
-
+    await update();
+    
     expect(gameState).toBe('gameover');
 });
