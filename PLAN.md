@@ -20,14 +20,14 @@ This is a side scrolling game similar to Mario.  You kill enemies by jumping on 
         - Player movement physics.
         - Enemy collision/death logic.
         - Power-up duration and effect logic.
-    - [ ] **Headless Browser Testing**:
-        - [ ] Setup **Playwright**.
-        - [ ] Create automation scripts to:
+    - [X] **Headless Browser Testing**:
+        - [X] Setup **Playwright**.
+        - [X] Create automation scripts to:
             - Verify level transitions.
             - Simulate "Jump on Zombie" action to verify score increase.
             - Verify "Fall in Pit" triggers Game Over.
 - [x] **Level Loading System**: Implement a JSON-based level loader to support 10+ distinct level configurations.
-- [ ] **Physics Engine Decoupling**: Separate collision logic from rendering to allow for headless testing.
+- [X] **Physics Engine Decoupling**: Separate collision logic from rendering to allow for headless testing.
 - [x] **Entity Component System (ECS)**: Refactor Player, Zombie, and Power-ups into a common `Entity` class for easier expansion.
 - [x] **Collision Expansion**: Add detection for "Pits" (falling out of bounds) and "Spikes" (instant damage).
 
