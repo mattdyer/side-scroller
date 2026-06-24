@@ -64,7 +64,7 @@ export function checkCollisions(entities, currentLevelData, config, canvasHeight
 }
 
 export function updatePhysics(entities, currentLevelData, config, keys, canvasHeight) {
-    const { player, enemies, platforms } = entities;
+    const { player, enemies, platforms, projectiles } = entities;
     if (!currentLevelData) return { scoreUpdate: 0, gameState: 'playing' };
 
     let scoreUpdate = 0;
