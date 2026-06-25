@@ -14,6 +14,7 @@ export const config = {
 
 export const player = new Entity(10.0, 300, 50, 50);
 player.image = typeof Image !== 'undefined' ? new Image() : null;
+player.image.src = 'assets/images/player.png';
 
 export const enemies = [];
 export let projectiles = [];
@@ -228,7 +229,7 @@ export function draw() {
     }
 
     if (currentLevelData && currentLevelData.platforms) {
-        currentLevelData.platforms.forEach(platform => {
+        platforms.forEach(platform => {
             platform.draw(ctx);
         });
     }
