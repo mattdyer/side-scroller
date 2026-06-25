@@ -70,7 +70,7 @@ if (typeof window !== 'undefined') {
         get config() { return config; },
         get currentLevelData() { return currentLevelData; },
         setGameState: setTestState,
-        resetGameState: reset
+        resetGameState: resetGameState
     };
 }
 
