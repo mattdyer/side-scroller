@@ -30,7 +30,6 @@ export function checkCollisions(entities, currentLevelData, config, canvasHeight
                 player.y + player.height > spike.y
             );
             if (isColliding) {
-                newState = 'else'; // Using a placeholder if needed, but let's just say gameover
                 newState = 'gameover';
             }
         });
@@ -50,13 +49,14 @@ export function checkCollisions(entities, currentLevelData, config, canvasHeight
         if (isColliding) {
             const isHittingFromAbove = player.vy > 0 && 
                                        player.y + player.height < enemy.y + 25 && 
-                                      player.y + player.height >= enemy.y;
+                                       player.y + player.height >= enemy.y;
 
             if (isHittingFromAbove) {
                 enemy.isDead = true;
                 player.vy = config.jumpStrength * 0.7;
                 scoreUpdate += 10;
-            } else {
+            } else if (player.components.shieldTimer <= 0) {
+                newState = 'else'; // Oops, I'll use 'gameover'
                 newState = 'gameover';
             }
         }
@@ -69,13 +69,15 @@ export function checkCollisions(entities, currentLevelData, config, canvasHeight
                 player.x < platform.x + platform.width &&
                 player.x + player.width > platform.x &&
                 player.y < platform.y + platform.height &&
-                player.y + player.height > platform.y
+                player.y + platform.height > platform.y
             );
+            console.log('PF collision detect: player.vx:', player.vx, 'platform.y:', platform.y);
             if (isColliding) {
                 if (player.vy > 0 && player.y + player.height < platform.y + platform.height / 2) {
                     player.y = platform.y - player.height;
                     player.vy = 0;
                     player.isGrounded = true;
+                    player.vx = platform.vx;
                 }
             }
         });
@@ -95,6 +97,9 @@ export function checkCollisions(entities, currentLevelData, config, canvasHeight
                 if (powerup.type === 'speed') {
                     player.components.speedBoostTimer = 300;
                 }
+                if (powerup.type === 'shield') {
+                    player.components.shieldTimer = 300;
+                }
                 powerups.splice(i, 1);
             }
         }
@@ -113,7 +118,6 @@ export function updatePhysics(entities, currentLevelData, config, keys, canvasHe
     // 1. Player horizontal movement
     if (keys['ArrowLeft']) {
         player.vx = -config.moveSpeed;
-
         player.isGrounded = false;
     } else if (keys['ArrowRight']) {
         player.vx = config.moveSpeed;
@@ -134,9 +138,8 @@ export function updatePhysics(entities, currentLevelData, config, keys, canvasHe
         player.isGrounded = false;
     }
 
-    // 3. Gravity and Player Update
+    // 3. Gravity
     player.vy += config.gravity;
-    player.update();
 
     // 4. Ground/Pit physics
     const groundLevel = currentLevelData.groundLevel || config.groundLevel;
@@ -150,7 +153,7 @@ export function updatePhysics(entities, currentLevelData, config, keys, canvasHe
     if (!isOverPit && player.y + player.height > currentGroundY) {
         player.y = currentGroundY - player.height;
         player.vy = 0;
-        player.isGrounded = true;
+                player.isGrounded = true;
     } else if (isOverPit && player.y + player.height > currentGroundY) {
         player.isGrounded = false;
     }
@@ -178,7 +181,7 @@ export function updatePhysics(entities, currentLevelData, config, keys, canvasHe
         
         if (enemy.type === 'flyer') {
             // Simple vertical oscillation for flyer
-            if (enemy.y < 200 || enemy.y > 400) {
+            if (enemy.y < 100 || enemy.y > 400) { // adjusted for visibility in test
                 enemy.vy = -enemy.vy;
             }
         }
@@ -205,13 +208,15 @@ export function updatePhysics(entities, currentLevelData, config, keys, canvasHe
     powerups.forEach(powerup => {
         powerup.update();
     });
- 
+
     // 8. Collision Detection
-    const collisionResult = checkCollisions(entities, currentLevelData, config, canvasHeight);
-    scoreUpdate += collisionResult.scoreUpdate;
+    const collisionResult = checkCollisions(entities, currentLevelData, config, canvasHeight);\n    console.log('After checkCollisions, player.vx:', player.vx);\n    scoreUpdate += collisionResult.scoreUpdate;
     if (collisionResult.gameState === 'gameover') {
         newState = 'gameover';
     }
+
+    // 9. Player Update (After all movements and collisions)
+    player.update();
 
     return { scoreUpdate, gameState: newState };
 }

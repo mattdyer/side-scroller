@@ -26,7 +26,7 @@ export const level = {
     index: 0
 };
 
-const levels = ['assets/levels/level1.json', 'assets/levels/level2.json'];
+export const levels = ['assets/levels/level1.json', 'assets/levels/level2.json'];
 let isTransitioning = false;
 
 export let currentLevelData = null;
@@ -87,6 +87,9 @@ export function resetGameState() {
     player.vy = 0;
     player.isDead = false;
     player.isGrounded = false;
+    player.components.shieldTimer = 0;
+    player.components.speedBoostTimer = 0;
+    player.components.doubleJumpAvailable = true;
     enemies.length = 0;
     platforms.length = 0;
     projectiles.length = 0;
@@ -261,7 +264,7 @@ export function draw() {
         }
     });
 
-    ctx.restore;
+    ctx.restore();
 }
 
 if (typeof window !== 'undefined') {

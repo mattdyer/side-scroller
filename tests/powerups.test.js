@@ -34,15 +34,20 @@ describe('Powerups', () => {
     });
 
     it('should activate speed boost on collision', async () => {
-        // Run a few updates to ensure collision
-        for (let i = 0; i < 10; i++) {
-            await game.update();
-        }
-
-        // Check if powerup was removed (it should be removed if collision was handled)
-        // Wait, I haven't implemented removal yet.
-        // Check if the timer is active and then starts decreasing
+        // Setup: Player and powerup are overlapping
+        player.x = 200;
+        player.y = 300;
+        
+        // Call update - this should trigger collision detection
+        await game.update();
+        
+        // Check that the timer was set
         expect(player.components.speedBoostTimer).toBe(300);
+        
+        // Check that the powerup was removed
+        expect(powerups.length).toBe(0);
+
+        // Call update again - the timer should decrease
         await game.update();
         expect(player.components.speedBoostTimer).toBe(299);
     });
