@@ -113,8 +113,12 @@ export async function loadLevel(levelPath) {
         const response = await fetch(levelPath);
         const levelData = await response.json();
         currentLevelData = levelData;
-        
         const canvasHeight = canvas ? canvas.height : config.canvasHeight;
+        player.x = 100;
+        player.y = 300;
+        player.vx = 0;
+        player.vy = 0;
+
         const groundLevel = levelData.groundLevel || config.groundLevel;
         
         enemies.length = 0;

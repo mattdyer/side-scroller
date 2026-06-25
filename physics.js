@@ -48,7 +48,7 @@ export function checkCollisions(entities, currentLevelData, config, canvasHeight
 
         if (isColliding) {
             const isHittingFromAbove = player.vy > 0 && 
-                                       player.y + player.height < enemy.y + 25 && 
+                                       player.y + player.height < enemy.y + 50 && 
                                        player.y + player.height >= enemy.y;
 
             if (isHittingFromAbove) {
