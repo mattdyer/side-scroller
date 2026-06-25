@@ -33,7 +33,7 @@ test.describe('Game End-to-End Tests', () => {
         });
         
         // Wait for the jump and fall to complete
-        await page.waitForTimeout(3000);
+        await page.waitForTimeout(3500);
 
         const scoreElement = page.locator('#score');
         await expect(scoreElement).toHaveText('10');
