@@ -30,7 +30,7 @@ export const levels = ['assets/levels/level1.json', 'assets/levels/level2.json']
 let isTransitioning = false;
 
 export let currentLevelData = null;
-export let gameState = 'playing';
+export let gameState = 'menu';
 export let score = 0;
 export let keys = {};
 export let scoreElement = null;
@@ -70,9 +70,10 @@ if (typeof window !== 'undefined') {
         get config() { return config; },
         get currentLevelData() { return currentLevelData; },
          loadLevel: loadLevel,
-         update: update,
-         setGameState: setTestState,
-         resetGameState: resetGameState
+          startGame: startGame,
+          update: update,
+          setGameState: setTestState,
+          resetGameState: resetGameState
     };
 }
 
@@ -162,7 +163,13 @@ export async function loadLevel(levelPath) {
     }
 }
 
+export async function startGame(levelPath) {
+    await loadLevel(levelPath);
+    gameState = 'playing';
+}
+
 export function update() {
+    if (gameState !== 'playing') return;
     const entities = { player, enemies, platforms, projectiles, powerups };
     const canvasHeight = canvas ? canvas.height : config.canvasHeight;
     const physicsResult = updatePhysics(entities, currentLevelData, config, keys, canvasHeight);

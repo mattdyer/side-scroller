@@ -24,7 +24,7 @@ test.describe('Game End-to-End Tests', () => {
         
         // Manually trigger level load and setup player
         await page.evaluate(async () => {
-            await window.game.loadLevel('assets/levels/level1.json');
+            await window.game.startGame('assets/levels/level1.json');
             // In level1, zombie is at x: 1000, y: 500.
             // Player needs to be positioned to jump on it.
             window.game.player.x = 1000;
@@ -42,7 +42,7 @@ test.describe('Game End-to-End Tests', () => {
     test('should trigger gameover when falling in a pit', async ({ page }) => {
         await page.waitForFunction(() => window.game !== undefined);
         await page.evaluate(async () => {
-            await window.game.loadLevel('assets/levels/level1.json');
+            await window.game.startGame('assets/levels/level1.json');
             // In level1, pit is at x: 500, width: 100.
             window.game.player.x = 550;
             window.game.player.y = 300;
@@ -61,7 +61,7 @@ test.describe('Game End-to-End Tests', () => {
         
         // Load level 1
         await page.evaluate(async () => {
-            await window.game.loadLevel('assets/levels/level1.json');
+            await window.game.startGame('assets/levels/level1.json');
         });
     
         // Move player to finish line of level 1 (2800)
