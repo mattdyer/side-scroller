@@ -76,6 +76,12 @@
                 document.exitFullscreen();
             }
         });
+ 
+        const startBtn = document.getElementById('startBtn');
+        startBtn.addEventListener('click', async () => {
+            await window.game.startGame('assets/levels/level1.json');
+            startBtn.style.display = 'none';
+        });
 
         document.addEventListener('keydown', (e) => {
             if (e.key.toLowerCase() === 'f') {
