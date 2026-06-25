@@ -69,8 +69,10 @@ if (typeof window !== 'undefined') {
         get score() { return score; },
         get config() { return config; },
         get currentLevelData() { return currentLevelData; },
-        setGameState: setTestState,
-        resetGameState: resetGameState
+         loadLevel: loadLevel,
+         update: update,
+         setGameState: setTestState,
+         resetGameState: resetGameState
     };
 }
 
