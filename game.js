@@ -168,6 +168,10 @@ export function update() {
     const physicsResult = updatePhysics(entities, currentLevelData, config, keys, canvasHeight);
     
     score += physicsResult.scoreUpdate;
+    if (scoreElement) scoreElement.innerText = score.toString();
+    if (physicsResult.scoreUpdate > 0) {
+        console.log('Score updated! New score:', score);
+    }
     if (physicsResult.gameState === 'gameover') {
         gameState = 'gameover';
     }
