@@ -123,10 +123,10 @@ export function updatePhysics(entities, currentLevelData, config, keys, canvasHe
     // 1. Player horizontal movement
     if (keys['ArrowLeft']) {
         player.vx = -config.moveSpeed;
-        player.isGrounded = false;
+        //player.isGrounded = false;
     } else if (keys['ArrowRight']) {
         player.vx = config.moveSpeed;
-        player.isGrounded = false;
+        //player.isGrounded = false;
     } else {
         player.vx = 0;
     }
@@ -148,8 +148,14 @@ export function updatePhysics(entities, currentLevelData, config, keys, canvasHe
         }
     }
 
+    console.log(player.isGrounded);
+
     // 3. Gravity
-    player.vy += config.gravity;
+    if(!player.isGrounded) {
+        player.vy += config.gravity;
+    }else{
+        player.vy = 0;
+    }
 
     // 4. Ground/Pit physics
     const groundLevel = currentLevelData.groundLevel || config.groundLevel;

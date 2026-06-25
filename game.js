@@ -4,7 +4,7 @@ import { updatePhysics, checkCollisions as physicsCheckCollisions } from './phys
 export { checkCollisions } from './physics.js';
 
 export const config = {
-    gravity: 0.5,
+    gravity: -0.5,
     jumpStrength: -12,
     moveSpeed: 3,
     groundLevel: 5.0,
@@ -14,7 +14,10 @@ export const config = {
 
 export const player = new Entity(10.0, 300, 50, 50);
 player.image = typeof Image !== 'undefined' ? new Image() : null;
-player.image.src = 'assets/images/player.png';
+player.color = '#000000';
+/*if(player.image){
+    player.image.src = 'assets/images/player.png';
+}*/
 
 export const enemies = [];
 export let projectiles = [];
@@ -78,6 +81,13 @@ if (typeof window !== 'undefined') {
           setGameState: setTestState,
           resetGameState: resetGameState
     };
+    window.addEventListener('keydown', (e) => {
+        keys[e.code] = true;
+    });
+    window.addEventListener('keyup', (e) => {
+        keys[e.code] = false;
+    });
+
 }
 
 export const images = {
@@ -233,6 +243,8 @@ export function draw() {
             platform.draw(ctx);
         });
     }
+
+    console.log('Drawing player at:', player.x, player.y);
 
     player.draw(ctx);
 

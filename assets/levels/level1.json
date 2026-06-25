@@ -1,6 +1,6 @@
 {
     "width": 3000,
-    "groundLevel": 50,
+    "groundLevel": 20,
     "pits": [
         { "x": 500, "width": 100 }
     ],
