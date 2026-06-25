@@ -62,6 +62,8 @@ export function setTestState(state) {
 
 if (typeof window !== 'undefined') {
     scoreElement = document.getElementById('score');
+    canvas = document.getElementById('gameCanvas');
+    ctx = canvas ? canvas.getContext('2d') : null;
     window.game = {
         get player() { return player; },
         get enemies() { return enemies; },
