@@ -52,11 +52,17 @@ export function checkCollisions(entities, currentLevelData, config, canvasHeight
                                        player.y + player.height >= enemy.y;
 
             if (isHittingFromAbove) {
-                enemy.isDead = true;
-                player.vy = config.jumpStrength * 0.7;
-                scoreUpdate += 10;
+                if (enemy.type === 'boss') {
+                    enemy.hp -= 10;
+                    if (enemy.hp <= 0) enemy.isDead = true;
+                    player.vy = config.jumpStrength * 0.7;
+                    scoreUpdate += 10;
+                } else {
+                    enemy.isDead = true;
+                    player.vy = config.jumpStrength * 0.7;
+                    scoreUpdate += 10;
+                }
             } else if (player.components.shieldTimer <= 0) {
-                newState = 'else'; // Oops, I'll use 'gameover'
                 newState = 'gameover';
             }
         }
@@ -69,15 +75,14 @@ export function checkCollisions(entities, currentLevelData, config, canvasHeight
                 player.x < platform.x + platform.width &&
                 player.x + player.width > platform.x &&
                 player.y < platform.y + platform.height &&
-                player.y + platform.height > platform.y
+                player.y + player.height > platform.y
             );
-            console.log('PF collision detect: player.vx:', player.vx, 'platform.y:', platform.y);
             if (isColliding) {
                 if (player.vy > 0 && player.y + player.height < platform.y + platform.height / 2) {
                     player.y = platform.y - player.height;
                     player.vy = 0;
                     player.isGrounded = true;
-                    player.vx = platform.vx;
+                    player.vx = platform.vx || 0;
                 }
             }
         });
@@ -133,9 +138,14 @@ export function updatePhysics(entities, currentLevelData, config, keys, canvasHe
     }
 
     // 2. Player jump
-    if (keys['Space'] && player.isGrounded) {
-        player.vy = config.jumpStrength;
-        player.isGrounded = false;
+    if (keys['Space']) {
+        if (player.isGrounded) {
+            player.vy = config.jumpStrength;
+            player.isGrounded = false;
+        } else if (player.components.doubleJumpAvailable) {
+            player.vy = config.jumpStrength;
+            player.components.doubleJumpAvailable = false;
+        }
     }
 
     // 3. Gravity
@@ -150,29 +160,32 @@ export function updatePhysics(entities, currentLevelData, config, keys, canvasHe
         player.x + player.width > pit.x
     ) ?? false;
 
-    if (!isOverPit && player.y + player.height > currentGroundY) {
+    if (!isOverPit && player.y + player.height > currentGroundY && player.y + player.height < canvasHeight) {
         player.y = currentGroundY - player.height;
         player.vy = 0;
-                player.isGrounded = true;
+        player.isGrounded = true;
+        player.components.doubleJumpAvailable = true;
     } else if (isOverPit && player.y + player.height > currentGroundY) {
         player.isGrounded = false;
     }
 
     // 5. Platform movement
-    platforms.forEach(platform => {
-        if (platform.vx !== 0) {
-            platform.x += platform.vx;
-            if (Math.abs(platform.x - platform.startX) > platform.range) {
-                platform.vx = -platform.vx;
+    if (platforms) {
+        platforms.forEach(platform => {
+            if (platform.vx !== 0) {
+                platform.x += platform.vx;
+                if (platform.range && Math.abs(platform.x - platform.startX) > platform.range) {
+                    platform.vx = -platform.vx;
+                }
             }
-        }
-        if (platform.vy !== 0) {
-            platform.y += platform.vy;
-            if (Math.abs(platform.y - platform.startY) > platform.rangeY) {
-                platform.vy = -platform.vy;
+            if (platform.vy !== 0) {
+                platform.y += platform.vy;
+                if (platform.rangeY && Math.abs(platform.y - platform.startY) > platform.rangeY) {
+                    platform.vy = -platform.vy;
+                }
             }
-        }
-    });
+        });
+    }
 
     // 6. Enemy movement
     enemies.forEach(enemy => {
@@ -180,14 +193,12 @@ export function updatePhysics(entities, currentLevelData, config, keys, canvasHe
         enemy.update();
         
         if (enemy.type === 'flyer') {
-            // Simple vertical oscillation for flyer
-            if (enemy.y < 100 || enemy.y > 400) { // adjusted for visibility in test
+            if (enemy.y < 100 || enemy.y > 400) {
                 enemy.vy = -enemy.vy;
             }
         }
         
-        if (enemy.type === 'ranged') {
-            // Randomly shoot a projectile
+        if (enemy.type === 'ranged' || (enemy.type === 'boss' && enemy.hp <= 50)) {
             if (Math.random() < 0.1) {
                 const projectile = new Entity(enemy.x, enemy.y, 10, 10);
                 projectile.vx = -5;
@@ -195,8 +206,6 @@ export function updatePhysics(entities, currentLevelData, config, keys, canvasHe
                 projectiles.push(projectile);
             }
         }
-        
-        if (enemy.x < 0) enemy.x = 0;
     });
 
     // 6.5. Projectile movement
@@ -209,13 +218,14 @@ export function updatePhysics(entities, currentLevelData, config, keys, canvasHe
         powerup.update();
     });
 
-    // 8. Collision Detection
-    const collisionResult = checkCollisions(entities, currentLevelData, config, canvasHeight);\n    console.log('After checkCollisions, player.vx:', player.vx);\n    scoreUpdate += collisionResult.scoreUpdate;
+    // 9. Collision Detection
+    const collisionResult = checkCollisions(entities, currentLevelData, config, canvasHeight);
+    scoreUpdate += collisionResult.scoreUpdate;
     if (collisionResult.gameState === 'gameover') {
         newState = 'gameover';
     }
 
-    // 9. Player Update (After all movements and collisions)
+    // 8. Player Update (Moved after collision so vx/vy from collision are applied)
     player.update();
 
     return { scoreUpdate, gameState: newState };

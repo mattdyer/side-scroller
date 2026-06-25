@@ -1,8 +1,8 @@
-console.log('BROWSER_CONSOLE: HELLO');
 import { Entity } from './Entity.js';
 export { Entity };
 import { updatePhysics, checkCollisions as physicsCheckCollisions } from './physics.js';
 export { checkCollisions } from './physics.js';
+
 export const config = {
     gravity: 0.5,
     jumpStrength: -12,
@@ -37,33 +37,13 @@ export let scoreElement = null;
 export let canvas = null;
 export let ctx = null;
 
-
-if (typeof window !== 'undefined') {
-    scoreElement = document.getElementById('score');
-    console.log('BROWSER_CONSOLE: scoreElement is', scoreElement);
-    window.game = {
-        get player() { return player; },
-        get enemies() { return enemies; },
-        get gameState() { return gameState; },
-        get score() { return score; },
-        get config() { return config; },
-        get currentLevelData() { return currentLevelData; },
-        setGameState: setTestState,
-        resetGameState: resetGameState,
-        loadLevel: loadLevel,
-        update: update
-    };
-    console.log('BROWSER_CONSOLE: window.game initialized');
-}
-
-export const images = {
-    player: typeof Image !== 'undefined' ? new Image() : null,
-    zombie: typeof Image !== 'undefined' ? new Image() : null
-};
-
-
 export function setTestState(state) {
-    if (state.currentLevelData !== undefined) currentLevelData = state.currentLevelData;
+    if (state.currentLevelData !== undefined) {
+        currentLevelData = state.currentLevelData;
+        if (state.currentLevelData.finishLineX !== undefined) {
+            level.finishLineX = state.currentLevelData.finishLineX;
+        }
+    }
     if (state.score !== undefined) score = state.score;
     if (state.gameState !== undefined) gameState = state.gameState;
     if (state.keys !== undefined) Object.assign(keys, state.keys);
@@ -79,6 +59,25 @@ export function setTestState(state) {
     if (state.ctx !== undefined) ctx = state.ctx;
     if (state.scoreElement !== undefined) scoreElement = state.scoreElement;
 }
+
+if (typeof window !== 'undefined') {
+    scoreElement = document.getElementById('score');
+    window.game = {
+        get player() { return player; },
+        get enemies() { return enemies; },
+        get gameState() { return gameState; },
+        get score() { return score; },
+        get config() { return config; },
+        get currentLevelData() { return currentLevelData; },
+        setGameState: setTestState,
+        resetGameState: reset
+    };
+}
+
+export const images = {
+    player: typeof Image !== 'undefined' ? new Image() : null,
+    zombie: typeof Image !== 'undefined' ? new Image() : null
+};
 
 export function resetGameState() {
     player.x = 100;
@@ -99,10 +98,10 @@ export function resetGameState() {
     score = 0;
     level.width = 3000;
     level.index = 0;
+    level.finishLineX = 0;
     keys = {};
     if (scoreElement) scoreElement.innerText = '0';
 }
-
 
 export async function loadLevel(levelPath) {
     try {
@@ -134,90 +133,49 @@ export async function loadLevel(levelPath) {
             });
         }
         if (levelData.platforms) {
-            levelData.platforms.forEach(platformData => {
+            levelData.platforms.forEach(plat => {
                 const platform = new Entity(
-                    platformData.x,
-                    platformData.y,
-                    platformData.width,
-                    platformData.height
+                    plat.x,
+                    plat.y,
+                    plat.width,
+                    plat.height
                 );
-                platform.vx = platformData.vx || 0;
-                platform.vy = platformData.vy || 0;
-                platform.range = platformData.range || 0;
-                platform.rangeY = platformData.rangeY || 0;
-                platform.startX = platformData.x;
-                platform.startY = platformData.y;
-                platform.color = 'gray';
+                platform.vx = plat.vx || 0;
+                platform.vy = plat.vy || 0;
+                platform.type = 'platform';
                 platforms.push(platform);
             });
         }
-
-        if (levelData.powerups) {
-            levelData.powerups.forEach(powerupData => {
-                const powerup = new Entity(
-                    powerupData.x,
-                    powerupData.y,
-                    powerupData.width,
-                    powerupData.height
-                );
-                powerup.type = powerupData.type;
-                powerup.color = 'gold';
-                powerups.push(powerup);
-            });
+        if (levelData.finishLineX) {
+            level.finishLineX = levelData.finishLineX;
         }
+        level.width = levelData.width || 3000;
 
-        projectiles.length = 0;
-        powerups.length = 0;
-        
-        player.x = 100;
-        player.y = 300;
-        player.vx = 0;
-        player.vy = 0;
-        player.isDead = false;
-        player.isGrounded = false;
-        level.width = levelData.width;
-        level.finishLineX = levelData.finishLineX;
     } catch (error) {
         console.error("Failed to load level:", error);
     }
 }
 
-export async function update() {
-    if (gameState !== 'playing') return;
-    if (!currentLevelData) return;
-
-    const { scoreUpdate, gameState: physicsGameState } = updatePhysics(
-        { player, enemies, platforms, projectiles, powerups },
-        currentLevelData,
-        config,
-        keys,
-        canvas ? canvas.height : config.canvasHeight
-    );
-
-    if (physicsGameState === 'gameover') {
+export function update() {
+    const entities = { player, enemies, platforms, projectiles, powerups };
+    const canvasHeight = canvas ? canvas.height : config.canvasHeight;
+    const physicsResult = updatePhysics(entities, currentLevelData, config, keys, canvasHeight);
+    
+    score += physicsResult.scoreUpdate;
+    if (physicsResult.gameState === 'gameover') {
         gameState = 'gameover';
     }
-    score += scoreUpdate;
-    if (scoreElement && scoreUpdate > 0) {
-        scoreElement.innerText = score;
-    }
-
-    if (keys['KeyR']) {
-        if (typeof window !== 'undefined') {
-            location.reload();
-        }
-    }
-
-    if (currentLevelData && player.x >= currentLevelData.finishLineX && !isTransitioning) {
-        isTransitioning = true;
-        level.index++;
-        if (level.index < levels.length) {
-            loadLevel(levels[level.index]).then(() => {
-                isTransitioning = false;
+    
+    // Level Progression
+    if (currentLevelData && level.finishLineX > 0 && player.x >= level.finishLineX) {
+        const nextLevelIndex = level.index + 1;
+        if (nextLevelIndex < levels.length) {
+            level.index = nextLevelIndex;
+            loadLevel(levels[nextLevelIndex]).then(() => {
+                // level transition logic
             });
         } else {
             gameState = 'gameover';
-            isTransitioning = false;
         }
     }
 }
@@ -261,6 +219,15 @@ export function draw() {
     enemies.forEach(enemy => {
         if (!enemy.isDead) {
             enemy.draw(ctx);
+            if (enemy.type === 'boss' && enemy.hp !== undefined) {
+                ctx.fillStyle = 'red';
+                const barWidth = enemy.width;
+                const barHeight = 5;
+                const healthPercent = enemy.hp / 100; 
+                ctx.fillRect(enemy.x, enemy.y - 10, barWidth, barHeight);
+                ctx.fillStyle = 'green';
+                ctx.fillRect(enemy.x, enemy.y - 10, barWidth * healthPercent, barHeight);
+            }
         }
     });
 
