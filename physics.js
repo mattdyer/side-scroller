@@ -148,8 +148,7 @@ export function updatePhysics(entities, currentLevelData, config, keys, canvasHe
         }
     }
 
-    console.log(player.isGrounded);
-
+    
     // 3. Gravity
     if(!player.isGrounded) {
         player.vy += config.gravity;

@@ -14,10 +14,9 @@ export const config = {
 
 export const player = new Entity(10.0, 300, 50, 50);
 player.image = typeof Image !== 'undefined' ? new Image() : null;
-player.color = '#000000';
-/*if(player.image){
+if(player.image){
     player.image.src = 'assets/images/player.png';
-}*/
+}
 
 export const enemies = [];
 export let projectiles = [];
@@ -243,8 +242,6 @@ export function draw() {
             platform.draw(ctx);
         });
     }
-
-    console.log('Drawing player at:', player.x, player.y);
 
     player.draw(ctx);
 
