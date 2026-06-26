@@ -110,7 +110,20 @@ export function checkCollisions(entities, currentLevelData, config, canvasHeight
         }
     }
 
+    projectiles.forEach(projectile => {
+        const isColliding = (
+            player.x < projectile.x + projectile.width &&
+            player.x + player.width > projectile.x &&
+            player.y < projectile.y + projectile.height &&
+            player.y + player.height > projectile.y
+        );
+        if (isColliding && player.components.shieldTimer <= 0) {
+            newState = 'gameover';
+        }
+    });
+
     return { scoreUpdate, gameState: newState };
+
 }
 
 export function updatePhysics(entities, currentLevelData, config, keys, canvasHeight) {
@@ -203,8 +216,9 @@ export function updatePhysics(entities, currentLevelData, config, keys, canvasHe
             }
         }
         
-        if (enemy.type === 'ranged' || (enemy.type === 'boss' && enemy.hp <= 50)) {
-            if (Math.random() < 0.1) {
+        if (enemy.type === 'ranged' || (enemy.type === 'boss' && (enemy.hp <= 50 || enemy.hp <= 20))) {
+            const frequency = enemy.hp <= 20 ? 0.3 : 0.1;
+            if (Math.random() < frequency) {
                 const projectile = new Entity(enemy.x, enemy.y, 10, 10);
                 projectile.vx = -5;
                 projectile.vy = 0;

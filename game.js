@@ -107,6 +107,26 @@ export const images = {
     zombie: typeof Image !== 'undefined' ? new Image() : null
 };
 
+export const sounds = {
+    jump: typeof Audio !== 'undefined' ? new Audio('assets/sounds/jump.mp3') : null,
+    hit: typeof Audio !== 'undefined' ? new Audio('assets/sounds/hit.mp3') : null,
+    powerup: typeof Audio !== 'undefined' ? new Audio('assets/sounds/powerup.mp3') : null,
+    gameover: typeof Audio !== 'undefined' ? new Audio('assets/sounds/gameover.mp3') : null,
+    victory: typeof Audio !== 'undefined' ? new Audio('assets/sounds/victory.mp3') : null,
+    levelUp: typeof Audio !== 'undefined' ? new Audio('assets/sounds/levelup.mp3') : null,
+};
+
+export function playSound(soundName) {
+    try {
+        if (sounds[soundName]) {
+            sounds[soundName].currentTime = 0;
+            sounds[soundName].play().catch(e => console.error("Error playing sound:", e));
+        }
+    } catch (e) {
+        console.error("Sound error:", e);
+    }
+}
+
 export function resetGameState() {
     player.x = 100;
     player.y = 300;
@@ -196,7 +216,7 @@ export async function startGame(levelPath) {
 
 export function update() {
     if (gameState === 'menu' || gameState === 'gameover' || gameState === 'victory') {
-        const startBtn = document.getElementById('startBtn');
+        const startBtn = typeof document !== 'undefined' ? document.getElementById('startBtn') : null;
         if (startBtn) startBtn.style.display = 'block';
         if (keys['Space']) {
             resetGameState();
@@ -206,7 +226,7 @@ export function update() {
         }
         return;
     }
-    const startBtn = document.getElementById('startBtn');
+    const startBtn = typeof document !== 'undefined' ? document.getElementById('startBtn') : null;
     if (startBtn) startBtn.style.display = 'none';
 
     if (gameState !== 'playing') return;

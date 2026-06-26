@@ -28,14 +28,14 @@
     - [x] **Spikes**: Static hazards that trigger damage.
     - [x] **Moving Platforms**: Platforms that follow a predefined path.
 - [x] **Level Progression**: Implement a level transition system (Level 1 $\rightarrow$ Level 2, etc.).
-- [ ] **Create 10 levels for the game**
-- [ ] **UI/UX**: Add Main Menu With Start Game Option, Level Selection, and High Score persistence.
+- [x] **Create 10 levels for the game**
+- [x] **UI/UX**: Add Main Menu With Start Game Option, Level Selection, and High Score persistence.
 
 ## Phase 3: Enemy & Power-up Expansion
-- [ ] **Advanced Enemy Types**:
+- [x] **Advanced Enemy Types**:
     - [x] **Flyer**: Enemies that hover and move vertically.
     - [x] **Ranged Zombie**: Enemies that fire projectiles.
-- [ ] **Power-up System**:
+- [x] **Power-up System**:
     - [x] **Speed Boost**: Temporary increase to `moveSpeed`.
     - [x] **Shield**: Temporary immunity to enemy collisions.
     - [x] **Double Jump**: Ability to jump once more mid-air.

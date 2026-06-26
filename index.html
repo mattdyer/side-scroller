@@ -55,12 +55,32 @@
             border: none;
             border-radius: 5px;
         }
+        .level-btn {
+            position: static;
+            padding: 5px;
+            font-size: 12px;
+            background: #555;
+            color: white;
+        }
     </style>
 </head>
 <body>
     <div id="ui">Score: <span id="score">0</span></div>
     <div id="controls">Arrows to Move | Space to Jump | F to Fullscreen</div>
-    <button id="startBtn" style="position: absolute; top: 70px; left: 20px; padding: 10px; background: #0f0; color: #000; font-weight: bold; cursor: pointer;">Start Game</button>
+    <button id="startBtn" style="position: absolute; top: 70px; left: 20px; padding: 10px; background: #0f0; color: #000; font-weight: bold; cursor: pointer;">Start Level 1</button>
+    <div id="levelSelection" style="position: absolute; top: 70px; left: 20px; margin-left: 150px; display: flex; flex-wrap: wrap; max-width: 300px; gap: 5px;">
+        <button class="level-btn" data-level="assets/levels/level1.json">L1</button>
+        <button class="level-btn" data-level="assets/levels/level2.json">L2</button>
+        <button class="level-btn" data-level="assets/levels/for_boss.json">Boss</button>
+        <button class="level-btn" data-level="assets/levels/level3.json">L3</button>
+        <button class="level-btn" data-level="assets/levels/level4.json">L4</button>
+        <button class="level-btn" data-level="assets/levels/level5.json">L5</button>
+        <button class="level-btn" data-level="assets/levels/level6.json">L6</button>
+        <button class="level-btn" data-level="assets/levels/level7.json">L7</button>
+        <button class="level-btn" data-level="assets/levels/level8.json">L8</button>
+        <button class="level-btn" data-level="assets/levels/level9.json">L9</button>
+        <button class="level-btn" data-level="assets/level10.json">L10</button>
+    </div>
     <button id="fullscreenBtn">Fullscreen</button>
     <canvas id="gameCanvas"></canvas>
 
@@ -68,6 +88,8 @@
     <script>
         const canvas = document.getElementById('gameCanvas');
         const fullscreenBtn = document.getElementById('fullscreenBtn');
+        const startBtn = document.getElementById('startBtn');
+        const levelSelection = document.getElementById('levelSelection');
         
         fullscreenBtn.addEventListener('click', () => {
             if (!document.fullscreenElement) {
@@ -78,11 +100,20 @@
                 document.exitFullscreen();
             }
         });
- 
-        const startBtn = document.getElementById('startBtn');
+
         startBtn.addEventListener('click', async () => {
             await window.game.startGame('assets/levels/level1.json');
             startBtn.style.display = 'none';
+            levelSelection.style.display = 'none';
+        });
+
+        document.querySelectorAll('.level-btn').forEach(btn => {
+            btn.addEventListener('click', async () => {
+                const levelPath = btn.getAttribute('data-level');
+                await window.game.startGame(levelPath);
+                startBtn.style.display = 'none';
+                levelSelection.style.display = 'none';
+            });
         });
 
         document.addEventListener('keydown', (e) => {
