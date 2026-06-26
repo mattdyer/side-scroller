@@ -38,20 +38,20 @@ This is a side scrolling game similar to Mario.  You kill enemies by jumping on 
 - [ ] **Obstacle Implementation**:
     - [x] **Pits**: Trigger `gameover` state when player Y-coordinate exceeds ground level.
     - [x] **Spikes**: Static hazards that trigger damage.
-    - [ ] **Moving Platforms**: Platforms that follow a predefined path.
-- [ ] **Level Progression**: Implement a level transition system (Level 1 $\rightarrow$ Level 2, etc.).
+    - [x] **Moving Platforms**: Platforms that follow a predefined path.
+- [x] **Level Progression**: Implement a level transition system (Level 1 $\rightarrow$ Level 2, etc.).
 - [ ] Create 10 levels for the game
 - [ ] **UI/UX**: Add Main Menu With Start Game Option, Level Selection, and High Score persistence.
 - [ ] *Note: Ensure tests are written and run for each step.*
 
 ## Phase 3: Enemy & Power-up Expansion
 - [ ] **Advanced Enemy Types**:
-    - [ ] **Flyer**: Enemies that hover and move vertically.
-    - [ ] **Ranged Zombie**: Enemies that fire projectiles.
+    - [x] **Flyer**: Enemies that hover and move vertically.
+    - [x] **Ranged Zombie**: Enemies that fire projectiles.
 - [ ] **Power-up System**:
-    - [ ] **Speed Boost**: Temporary increase to `moveSpeed`.
-    - [ ] **Shield**: Temporary immunity to enemy collisions.
-    - [ ] **Double Jump**: Ability to jump once more mid-air.
+    - [x] **Speed Boost**: Temporary increase to `moveSpeed`.
+    - [x] **Shield**: Temporary immunity to enemy collisions.
+    - [x] **Double Jump**: Ability to jump once more mid-air.
 - [ ] *Note: Ensure tests are written and run for each step.*
 
 ## Phase 4: The Grand Finale (Boss Fight)
