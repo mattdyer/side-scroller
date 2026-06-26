@@ -1,0 +1,24 @@
+{
+    "width": 3000,
+    "groundLevel": 30,
+    "enemies": [
+        { "x": 500, "y": 500, "type": "zombie" },
+        { "x": 1000, "y": 400, "type": "flyer" },
+        { "x": 1500, "y": 500, "type": "zombie" },
+        { "x": 2000, "y": 400, "type": "flyer" },
+        { "x": 2500, "y": 500, "type": "zombie" }
+    ],
+    "pits": [
+        { "x": 700, "width": 300 },
+        { "x": 1700, "width": 300 }
+    ],
+    "spikes": [
+        { "x": 900, "y": 500, "width": 50, "height": 50 },
+        { "x": 1900, "y": 500, "width": 50, "height": 50 }
+    ],
+    "platforms": [
+        { "x": 400, "y": 400, "width": 100, "height": 20, "vx": 2, "range": 200, "startX": 400, "startY": 400, "rangeY": 0, "vy": 0 },
+        { "x": 1200, "y": 300, "width": 100, "height": 20, "vx": -2, "range": 200, "startX": 1200, "startY": 300, "rangeY": 0, "vy": 0 }
+    ],
+    "finishLineX": 2800
+}

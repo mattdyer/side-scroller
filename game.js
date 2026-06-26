@@ -29,7 +29,7 @@ export const level = {
     index: 0
 };
 
-export const levels = ['assets/levels/level1.json', 'assets/levels/level2.json', 'assets/levels/for_boss.json', 'assets/levels/level3.json', 'assets/levels/level4.json', 'assets/levels/level5.json', 'assets/levels/level6.json'];
+export const levels = ['assets/levels/level1.json', 'assets/levels/level2.json', 'assets/levels/for_boss.json', 'assets/levels/level3.json', 'assets/levels/level4.json', 'assets/levels/level5.json', 'assets/levels/level6.json', 'assets/levels/level7.json', 'assets/levels/level8.json', 'assets/levels/level9.json', 'assets/levels/level10.json'];
 let isTransitioning = false;
 
 export let currentLevelData = null;
