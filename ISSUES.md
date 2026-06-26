@@ -1,0 +1,3 @@
+- [ ] When I start the game I don't see my character.
+- [ ] We don't need the Start Game button anymore.
+- [ ] The Game Over and Press Space to Restart text is too large.
