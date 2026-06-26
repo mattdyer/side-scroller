@@ -1,7 +1,10 @@
 {
     "width": 2000,
     "groundLevel": 50,
-    "enemies": [],
+    "enemies": [
+        { "x": 1000, "y": 500, "type": "zombie" },
+        { "x": 1500, "y": 400, "type": "boss", "hp": 100 }
+    ],
     "pits": [],
     "spikes": [],
     "finishLineX": 1800

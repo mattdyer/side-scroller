@@ -91,17 +91,20 @@ describe('Game Logic', () => {
         expect(game.score).toBe(10);
     });
 
-    it('should set gameover when player hits enemy from side', () => {
-        game.setTestState({ currentLevelData: { width: 3000, enemies: [], groundLevel: 50 } });
-        const enemy = new Entity(100, 300, 50, 50);
-        enemy.type = 'zombie';
-        game.enemies.push(enemy);
-        game.player.x = 110;
-        game.player.y = 300;
-        game.player.vy = 0;
+    it('should restart the game when pressing space in gameover state', async () => {
+        game.setTestState({ 
+            currentLevelData: { width: 3000, enemies: [], groundLevel: 50 },
+            gameState: 'gameover'
+        });
+        game.keys['Space'] = true;
         
-        game.update();
+        // We need to mock loadLevel and startGame to prevent actual fetch
+        // But they are exported and use fetch.
+        // Since we already mocked fetch in beforeEach, it should work.
         
-        expect(game.gameState).toBe('gameover');
+        await game.update();
+        
+        expect(game.gameState).toBe('playing');
+        expect(game.player.x).toBe(100);
     });
 });

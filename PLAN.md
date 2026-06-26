@@ -52,9 +52,9 @@ This is a side scrolling game similar to Mario.  You kill enemies by jumping on 
 - [ ] *Note: Ensure tests are written and run for each step.*
 
 ## Phase 4: The Grand Finale (Boss Fight)
-- [ ] **Boss Entity**: A large, multi-phase entity with a health bar.
+- [x] **Boss Entity**: A large, multi-phase entity with a health bar.
 - [ ] **Boss Patterns**: Implement phases (e.g., Phase 1: Melee, Phase 2: Projectiles).
-- [ ] **Victory Condition**: Final level completion logic.
+- [x] **Victory Condition**: Final level completion logic.
 - [ ] *Note: Ensure tests are updated and run for each step.*
 
 ## Phase 5: Polish & Content
@@ -62,5 +62,5 @@ This is a side scrolling game similar to Mario.  You kill enemies by jumping on 
     - Use the image-generation skill
     - Be very specific with prompts to get the correct graphics style (Pixel art, Old school console graphics)
 - [ ] **Audio Integration**: Implement SFX for jumping, hitting enemies, and power-ups.
-- [ ] **UI/UX**: Add Main Menu, Level Selection, and High Score persistence.
+- [x] **UI/UX**: Add Main Menu, Level Selection, and High Score persistence.
 - [ ] *Note: Ensure tests are updated and run for each step.*

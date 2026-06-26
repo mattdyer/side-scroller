@@ -29,16 +29,27 @@ export const level = {
     index: 0
 };
 
-export const levels = ['assets/levels/level1.json', 'assets/levels/level2.json'];
+export const levels = ['assets/levels/level1.json', 'assets/levels/level2.json', 'assets/levels/level3.json'];
 let isTransitioning = false;
 
 export let currentLevelData = null;
 export let gameState = 'menu';
 export let score = 0;
+export let highScore = (typeof localStorage !== 'undefined') ? parseInt(localStorage.getItem('pixelZombieHighScore')) || 0 : 0;
 export let keys = {};
 export let scoreElement = null;
+export let highScoreElement = null;
 export let canvas = null;
 export let ctx = null;
+
+export function updateHighScore(newScore) {
+    if (newScore > highScore) {
+        highScore = newScore;
+        if (typeof localStorage !== 'undefined') {
+            localStorage.setItem('pixelZombieHighScore', highScore.toString());
+        }
+    }
+}
 
 export function setTestState(state) {
     if (state.currentLevelData !== undefined) {
@@ -48,6 +59,7 @@ export function setTestState(state) {
         }
     }
     if (state.score !== undefined) score = state.score;
+    if (state.highScore !== undefined) highScore = state.highScore;
     if (state.gameState !== undefined) gameState = state.gameState;
     if (state.keys !== undefined) Object.assign(keys, state.keys);
     if (state.enemies !== undefined) {
@@ -61,6 +73,7 @@ export function setTestState(state) {
     if (state.canvas !== undefined) canvas = state.canvas;
     if (state.ctx !== undefined) ctx = state.ctx;
     if (state.scoreElement !== undefined) scoreElement = state.scoreElement;
+    if (state.highScoreElement !== undefined) highScoreElement = state.highScoreElement;
 }
 
 if (typeof window !== 'undefined') {
@@ -116,6 +129,7 @@ export function resetGameState() {
     level.finishLineX = 0;
     keys = {};
     if (scoreElement) scoreElement.innerText = '0';
+    if (highScoreElement) highScoreElement.innerText = highScore.toString();
 }
 
 export async function loadLevel(levelPath) {
@@ -181,13 +195,29 @@ export async function startGame(levelPath) {
 }
 
 export function update() {
+    if (gameState === 'menu' || gameState === 'gameover' || gameState === 'victory') {
+        const startBtn = document.getElementById('startBtn');
+        if (startBtn) startBtn.style.display = 'block';
+        if (keys['Space']) {
+            resetGameState();
+            startGame(levels[0]).then(() => {
+                gameState = 'playing';
+            });
+        }
+        return;
+    }
+    const startBtn = document.getElementById('startBtn');
+    if (startBtn) startBtn.style.display = 'none';
+
     if (gameState !== 'playing') return;
     const entities = { player, enemies, platforms, projectiles, powerups };
     const canvasHeight = canvas ? canvas.height : config.canvasHeight;
     const physicsResult = updatePhysics(entities, currentLevelData, config, keys, canvasHeight);
     
     score += physicsResult.scoreUpdate;
+    updateHighScore(score);
     if (scoreElement) scoreElement.innerText = score.toString();
+    if (highScoreElement) highScoreElement.innerText = highScore.toString();
     if (physicsResult.scoreUpdate > 0) {
         console.log('Score updated! New score:', score);
     }
@@ -204,13 +234,50 @@ export function update() {
                 // level transition logic
             });
         } else {
-            gameState = 'gameover';
+            const bossAlive = enemies.some(e => e.type === 'boss' && !e.isDead);
+            if (bossAlive) {
+                gameState = 'gameover';
+            } else {
+                gameState = 'victory';
+            }
         }
     }
 }
 
 export function draw() {
-    if (!ctx || !canvas) return;
+    if (gameState === 'menu') {
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = 'white';
+        ctx.font = '48px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText('Pixel Zombie Side-Scroller', canvas.width / 2, canvas.height / 2 - 50);
+        ctx.font = '24px Arial';
+        ctx.fillText('Press Space to Start', canvas.width / 2, canvas.height / 2 + 20);
+        
+        // Add High Score display
+        ctx.font = '18px Arial';
+        ctx.fillText(`High Score: ${highScore}`, canvas.width / 2, canvas.height / 2 + 100);
+        return;
+    }
+
+    if (gameState === 'gameover' || gameState === 'victory') {
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = 'white';
+        ctx.font = '48px Arial';
+        ctx.textAlign = 'center';
+        const text = gameState === 'victory' ? 'VICTORY!' : 'GAME OVER';
+        ctx.fillText(text, canvas.width / 2, canvas.height / 2);
+        ctx.font = '24px Arial';
+        ctx.fillText('Press Space to Restart', canvas.width / 2, canvas.height / 2 + 50);
+
+        // Add High Score display
+        ctx.font = '18px Arial';
+        ctx.fillText(`High Score: ${highScore}`, canvas.width / 2, canvas.height / 2 + 100);
+        return;
+    }
+
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     const cameraX = Math.max(0, Math.min(player.x - canvas.width / 2, level.width - canvas.width));
