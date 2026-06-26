@@ -28,7 +28,7 @@ describe('Platform Physics', () => {
         player.y = 355; // On top of platform (400 - 20)
         player.vx = 0;
         player.vy = 1;
-        player.isGrounded = true;
+        player.isGrounded = false;
     });
 
     it('should move the platform horizontally', async () => {

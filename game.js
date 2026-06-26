@@ -4,7 +4,7 @@ import { updatePhysics, checkCollisions as physicsCheckCollisions } from './phys
 export { checkCollisions } from './physics.js';
 
 export const config = {
-    gravity: -0.5,
+    gravity: 0.5,
     jumpStrength: -12,
     moveSpeed: 3,
     groundLevel: 5.0,
