@@ -1,4 +1,5 @@
 import { Entity } from './Entity.js';
+import { playSound } from './game.js';
 
 export function checkCollisions(entities, currentLevelData, config, canvasHeight) {
     const { player, enemies, spikes, pits, platforms, projectiles, powerups } = entities;
@@ -62,8 +63,10 @@ export function checkCollisions(entities, currentLevelData, config, canvasHeight
                     player.vy = config.jumpStrength * 0.7;
                     scoreUpdate += 10;
                 }
+                playSound('hit');
             } else if (player.components.shieldTimer <= 0) {
                 newState = 'gameover';
+                playSound('gameover');
             }
         }
     });
@@ -106,6 +109,7 @@ export function checkCollisions(entities, currentLevelData, config, canvasHeight
                     player.components.shieldTimer = 300;
                 }
                 powerups.splice(i, 1);
+                playSound('powerup');
             }
         }
     }
@@ -155,9 +159,36 @@ export function updatePhysics(entities, currentLevelData, config, keys, canvasHe
         if (player.isGrounded) {
             player.vy = config.jumpStrength;
             player.isGrounded = false;
+            playSound('jump');
         } else if (player.components.doubleJumpAvailable) {
             player.vy = config.jumpStrength;
             player.components.doubleJumpAvailable = false;
+            playSound('jump');
+        }
+    }
+
+    // 3. Gravity
+
+    if (keys['Space']) {
+        if (player.isGunded) { // wait, I'm making typos
+            player.vy = config.jumpStrength;
+            player.isGrounded = false;
+            playSound('jump');
+        } else if (player.components.doubleJumpAvailable) {
+            player.vy = config.jumpStrength;
+            player.components.doubleJumpAvailable = false;
+            playSound('jump');
+        }
+    }
+
+        if (player.isGrounded) {
+            player.vy = config.jumpStrength;
+            player.isGrounded = false;
+            playSound('jump');
+        } else if (player.components.doubleJumpAvailable) {
+            player.vy = config.jumpStrength;
+            player.components.doubleJumpAvailable = false;
+            playSound('jump');
         }
     }
 
